@@ -1,4 +1,5 @@
 package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
 
-public class Main {
+public class Main{
+    //Hi
 }
