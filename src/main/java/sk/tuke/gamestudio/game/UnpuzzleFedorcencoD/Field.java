@@ -1,5 +1,6 @@
 package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
 
+import java.security.Permission;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -12,12 +13,14 @@ public class Field
     private GameState gameState;
 
 
-    public Field(int rows, int cols, Piece[][] grid, List<Piece> pieces)
-    {
+    public Field(int rows, int cols)
+        {
         this.rows = rows;
         this.cols = cols;
-        this.grid = grid;
-        this.pieces = pieces;
+        this.grid = new Piece[rows][cols];
+        this.pieces = new ArrayList<>();
+        this.gameState = GameState.PLAYING;
+        //generateField(piececount);
     }
 
     public GameState getGameState() {
