@@ -15,8 +15,6 @@ public class Piece
         this.direction = direction;
         this.row = row;
         this.col = col;
-
-
     }
 
     public int getId() {
@@ -25,6 +23,10 @@ public class Piece
 
     public PieceState getState() {
         return state;
+    }
+
+    public void setState(PieceState state) {
+        this.state = state;
     }
 
     public int getRow() {
