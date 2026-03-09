@@ -5,7 +5,7 @@ public class Unpuzzle
 {
     public static void main(String[] args)
     {
-        Field field = new Field(4, 4);
+        //Field field = new Field(4, 4);
 
 
     }

@@ -9,7 +9,7 @@ public class Piece
     private final int col;
 
 
-    public Piece(int id, Direction direction, int row, int col)
+    public Piece(int id, int row, int col, Direction direction)
     {
         this.id = id;
         this.direction = direction;

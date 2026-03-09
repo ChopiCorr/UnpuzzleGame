@@ -1,6 +1,6 @@
 package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
 
-//import java.security.Permission;
+import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,18 +10,44 @@ public class Field
     private final int cols;
     private final Piece[][] grid;
     private final List<Piece> pieces;
+    private final String levelName;
     private GameState gameState;
 
 
-    public Field(int rows, int cols/*, int pieceCount*/)
+    public Field(Level level)
+    {
+        this.rows = level.getRows();
+        this.cols = level.getCols();
+        this.grid = new Piece[rows][cols];
+        this.pieces = new ArrayList<>();
+        this.levelName = "Level " + level.getNumber() + ":" + level.getName();
+        this.gameState = GameState.PLAYING;
+        loadlevel(level);
+    }
+
+    /*public Field(int rows, int cols, int pieceCount)
     {
         this.rows = rows;
         this.cols = cols;
         this.grid = new Piece[rows][cols];
         this.pieces = new ArrayList<>();
+        this.levelName = "Nahodna hra (" + rows + "x" + cols + ")";
         this.gameState = GameState.PLAYING;
-        //generateField(piececount);
+    }*/
+
+    private void loadlevel(Level level)
+    {
+        int id = 1;
+        for (Level.PieceDefinition def : level.getPieces())
+        {
+            Piece piece = new Piece(id, def.getRow(), def.getCol(), def.getDirection());
+            grid[def.getRow()][def.getCol()] = piece;
+            pieces.add(piece);
+            id++;
+        }
+
     }
+
 
     public boolean removePiece(int id)
     {
