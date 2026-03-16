@@ -101,6 +101,4 @@ public class levelPresets
         level.seal();
         return level;
     }
-
-
 }
