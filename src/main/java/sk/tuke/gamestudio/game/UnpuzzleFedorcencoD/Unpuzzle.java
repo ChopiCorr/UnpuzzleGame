@@ -1,12 +1,89 @@
 package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
 
+import java.util.Scanner;
 
 public class Unpuzzle
 {
     public static void main(String[] args)
     {
-        //Field field = new Field(4, 4);
+        Scanner scanner = new Scanner(System.in);
 
+        printBanner();
 
+        // Zobrazenie menu a výber levelu
+        int choice = selectLevel(scanner);
+
+        Level level = LevelPresets.getLevel(choice);
+        Field field = new Field(level);
+
+        // Scanner sa odovzdá ConsoleUI – neotvára nový
+        ConsoleUI ui = new ConsoleUI(field, scanner);
+        ui.run();
+
+        // Spýtaj sa hráča či chce hrať znova
+        while (playAgain(scanner))
+        {
+            choice = selectLevel(scanner);
+            field = new Field(LevelPresets.getLevel(choice));
+            ui = new ConsoleUI(field, scanner);
+            ui.run();
+        }
+
+        System.out.println();
+        System.out.println("Dakujeme za hru! Zbohom.");
+        scanner.close();
+    }
+
+    private static void printBanner()
+    {
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║                                      ║");
+        System.out.println("║          U N P U Z Z L E             ║");
+        System.out.println("║                                      ║");
+        System.out.println("║  Odstranujte bloky v spravnom        ║");
+        System.out.println("║  poradi. Kazdy blok sa pohybuje      ║");
+        System.out.println("║  v smere svojej sipky.               ║");
+        System.out.println("║                                      ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.println();
+    }
+
+    private static int selectLevel(Scanner scanner)
+    {
+        System.out.println("Vyberte uroven:");
+        for (int i = 1; i <= LevelPresets.LEVEL_COUNT; i++)
+        {
+            Level level = LevelPresets.getLevel(i);
+            System.out.println("  " + i + ".  " + level.getName());
+        }
+        System.out.println();
+
+        int choice = 0;
+        while (choice < 1 || choice > LevelPresets.LEVEL_COUNT)
+        {
+            System.out.print("Vasa volba (1-" + LevelPresets.LEVEL_COUNT + "): ");
+            if (scanner.hasNextInt())
+            {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+                if (choice < 1 || choice > LevelPresets.LEVEL_COUNT)
+                {
+                    System.out.println("  Neplatna volba. Zadajte cislo od 1 do " + LevelPresets.LEVEL_COUNT + ".");
+                }
+            }
+            else
+            {
+                System.out.println("  Neplatny vstup. Zadajte cislo.");
+                scanner.nextLine();
+            }
+        }
+        return choice;
+    }
+
+    private static boolean playAgain(Scanner scanner) {
+        System.out.println();
+        System.out.print("Chcete hrat znova? (a = ano, inak ukoncit): ");
+        String input = scanner.next().trim().toLowerCase();
+        return input.equals("a");
     }
 }

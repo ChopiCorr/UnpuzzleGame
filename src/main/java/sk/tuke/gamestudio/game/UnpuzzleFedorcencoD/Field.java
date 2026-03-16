@@ -1,6 +1,6 @@
 package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
 
-import java.util.Random;
+//import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ public class Field
     private final int cols;
     private final Piece[][] grid;
     private final List<Piece> pieces;
-    private final String levelName;
+        private final String levelName;
     private GameState gameState;
 
 

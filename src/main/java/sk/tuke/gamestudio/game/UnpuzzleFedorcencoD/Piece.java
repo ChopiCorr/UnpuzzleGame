@@ -15,6 +15,7 @@ public class Piece
         this.direction = direction;
         this.row = row;
         this.col = col;
+        this.state = PieceState.ON_BOARD;
     }
 
     public int getId() {

@@ -1,6 +1,6 @@
 package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
 
-public class levelPresets
+public class LevelPresets
 {
     public static final int LEVEL_COUNT = 4;
 
