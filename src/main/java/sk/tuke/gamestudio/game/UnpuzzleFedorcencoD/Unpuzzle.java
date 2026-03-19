@@ -80,7 +80,8 @@ public class Unpuzzle
         return choice;
     }
 
-    private static boolean playAgain(Scanner scanner) {
+    private static boolean playAgain(Scanner scanner)
+    {
         System.out.println();
         System.out.print("Chcete hrat znova? (a = ano, inak ukoncit): ");
         String input = scanner.next().trim().toLowerCase();
