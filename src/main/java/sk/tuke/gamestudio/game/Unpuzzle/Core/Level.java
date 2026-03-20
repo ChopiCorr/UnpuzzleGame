@@ -1,4 +1,4 @@
-package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
+package sk.tuke.gamestudio.game.Unpuzzle.Core;
 
 import java.util.ArrayList;
 import java.util.Collections;

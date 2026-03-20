@@ -1,5 +1,8 @@
-package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
+package sk.tuke.gamestudio.game.Unpuzzle.consoleUI;
 
+import sk.tuke.gamestudio.game.Unpuzzle.Core.Field;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.Level;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.LevelPresets;
 import sk.tuke.gamestudio.service.*;
 
 import java.util.Scanner;

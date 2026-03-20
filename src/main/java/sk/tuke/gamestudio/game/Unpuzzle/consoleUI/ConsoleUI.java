@@ -1,8 +1,12 @@
-package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
+package sk.tuke.gamestudio.game.Unpuzzle.consoleUI;
 
 import sk.tuke.gamestudio.entity.Comment;
 import sk.tuke.gamestudio.entity.Rating;
 import sk.tuke.gamestudio.entity.Score;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.Field;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.GameState;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.Piece;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.PieceState;
 import sk.tuke.gamestudio.service.CommentService;
 import sk.tuke.gamestudio.service.RatingService;
 import sk.tuke.gamestudio.service.ScoreService;
@@ -98,7 +102,7 @@ public class ConsoleUI
         if (scoreService == null) return;
         try
         {
-            Score score = new Score(player, GAME_NAME, points,
+            Score score = new Score(GAME_NAME, player, points,
                     Timestamp.valueOf(LocalDateTime.now()));
             scoreService.addScore(score);
             System.out.println("  Skore " + points + " bodov bolo ulozene pre hraca " + player + ".");

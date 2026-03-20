@@ -2,7 +2,8 @@ package sk.tuke.gamestudio.entity;
 
 import java.util.Date;
 
-public class Score {
+public class Score
+{
     private String game;
 
     private String player;
@@ -11,7 +12,8 @@ public class Score {
 
     private Date playedOn;
 
-    public Score(String game, String player, int points, Date playedOn) {
+    public Score(String game, String player, int points, Date playedOn)
+    {
         this.game = game;
         this.player = player;
         this.points = points;
