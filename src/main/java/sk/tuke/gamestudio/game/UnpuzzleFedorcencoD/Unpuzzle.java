@@ -1,5 +1,7 @@
 package sk.tuke.gamestudio.game.UnpuzzleFedorcencoD;
 
+import sk.tuke.gamestudio.service.*;
+
 import java.util.Scanner;
 
 public class Unpuzzle
@@ -8,25 +10,45 @@ public class Unpuzzle
     {
         Scanner scanner = new Scanner(System.in);
 
+        ScoreService scoreService     = null;
+        CommentService commentService = null;
+        RatingService ratingService   = null;
+
+        try
+        {
+            scoreService   = new ScoreServiceJDBC();
+            commentService = new CommentServiceJDBC();
+            ratingService  = new RatingServiceJDBC();
+            System.out.println("  [DB] Pripojenie k databaze uspesne.");
+        }
+        catch (Exception e)
+        {
+            System.out.println("  [WARN] Databaza nie je dostupna. Hra bezi bez sluzieb.");
+            System.out.println("  [WARN] " + e.getMessage());
+        }
+
         printBanner();
 
-        // Zobrazenie menu a výber levelu
+        System.out.print("Zadajte svoje meno: ");
+        String playerName = scanner.nextLine().trim();
+        if (playerName.isEmpty()) playerName = "Anonymous";
+        if (playerName.length() > 64) playerName = playerName.substring(0, 64);
+        System.out.println();
+
         int choice = selectLevel(scanner);
 
         Level level = LevelPresets.getLevel(choice);
         Field field = new Field(level);
 
-        // Scanner sa odovzdá ConsoleUI – neotvára nový
-        ConsoleUI ui = new ConsoleUI(field, scanner);
-        ui.run();
+        ConsoleUI ui = new ConsoleUI(field, scanner, scoreService, commentService, ratingService);
+        ui.run(playerName);
 
-        // Spýtaj sa hráča či chce hrať znova
         while (playAgain(scanner))
         {
             choice = selectLevel(scanner);
             field = new Field(LevelPresets.getLevel(choice));
-            ui = new ConsoleUI(field, scanner);
-            ui.run();
+            ui = new ConsoleUI(field, scanner, scoreService, commentService, ratingService);
+            ui.run(playerName);
         }
 
         System.out.println();
