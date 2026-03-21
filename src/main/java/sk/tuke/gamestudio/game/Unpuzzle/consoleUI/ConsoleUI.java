@@ -28,7 +28,6 @@ public class ConsoleUI
     private final CommentService commentService;
     private final RatingService ratingService;
 
-
     /*public ConsoleUI(Field field, Scanner scanner)
     {
         this.field = field;
@@ -47,7 +46,7 @@ public class ConsoleUI
         this.ratingService = ratingService;
     }
 
-    public ConsoleUI(Field field, Scanner scanner)
+    /*public ConsoleUI(Field field, Scanner scanner)
     {
         this(field, scanner, null, null, null);
     }
@@ -56,7 +55,7 @@ public class ConsoleUI
     public ConsoleUI(Field field)
     {
         this(field, new Scanner(System.in), null, null, null);
-    }
+    }*/
 
     public void run(String playerName)
     {
@@ -65,7 +64,23 @@ public class ConsoleUI
         while (field.getGameState() == GameState.PLAYING)
         {
             printField();
-            int id = getUserInput();
+            printLiveScore(moveCount);
+
+            String input = getUserInput(playerName);
+
+            if (input.equalsIgnoreCase("comment"))
+            {
+                askForComment(playerName);
+                continue;
+            }
+            if (input.equalsIgnoreCase("rating"))
+            {
+                askForRating(playerName);
+                showAverageRating();
+                continue;
+            }
+
+            int id = Integer.parseInt(input);
             boolean success = field.removePiece(id);
 
             if (!success)
@@ -79,10 +94,16 @@ public class ConsoleUI
             }
             System.out.println();
         }
+
         printField();
         printResult(moveCount);
 
-        int points = calculatePoints(field.getPieces().size(), moveCount);
+        int removed = (int) field.getPieces().stream()
+                .filter(p -> p.getState() == PieceState.REMOVED)
+                .count();
+        int points = calculatePoints((int) removed);
+
+        //int points = calculatePoints(field.getPieces().size(), moveCount);
         saveScore(playerName, points);
         showTopScores();
         askForComment(playerName);
@@ -90,11 +111,24 @@ public class ConsoleUI
         showAverageRating();
     }
 
-    private int calculatePoints(int pieceCount, int moveCount)
+    private void printLiveScore(int moveCount)
     {
-        int base = pieceCount * 100;
-        int penalty = moveCount * 5;
-        return Math.max(10, base - penalty);
+        int removed = (int) field.getPieces().stream()
+                .filter(p -> p.getState() == PieceState.REMOVED)
+                .count();
+        int currentPoints = calculatePoints(removed);
+
+        int remaining = field.getPieces().size() - removed;
+        System.out.println("  Aktualne skore: " + currentPoints
+                + "b  |  Tahy: " + moveCount
+                + "  |  Zostatok blokov: " + remaining);
+        System.out.println();
+    }
+
+
+    private int calculatePoints(int removeCount)
+    {
+        return removeCount * 10;
     }
 
     private void saveScore(String player, int points)
@@ -106,7 +140,8 @@ public class ConsoleUI
                     Timestamp.valueOf(LocalDateTime.now()));
             scoreService.addScore(score);
             System.out.println("  Skore " + points + " bodov bolo ulozene pre hraca " + player + ".");
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             System.out.println("  [WARN] Skore sa nepodarilo ulozit: " + e.getMessage());
         }
@@ -133,7 +168,8 @@ public class ConsoleUI
                 }
             }
             System.out.println();
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             System.out.println("  [WARN] Skore sa nepodarilo nacitat: " + e.getMessage());
         }
@@ -203,7 +239,7 @@ public class ConsoleUI
         }
         catch (Exception ignored) {}
 
-        System.out.print("  Ohodnoťte hru (1-5, Enter = preskocit): ");
+        System.out.print("  Ohodnotte hru (1-5, Enter = preskocit): ");
         String input = scanner.nextLine().trim();
         if (input.isEmpty()) return;
 
@@ -274,11 +310,11 @@ public class ConsoleUI
         System.out.println("║       GRATULUJEME! VYHRALI STE!      ║");
         System.out.println("╠══════════════════════════════════════╣");
         System.out.printf( "║  %-36s║%n", "Vsetky bloky odstranene.");
-        System.out.printf( "║  Pocet tahov: %-22d║%n", moveCount);
+        System.out.printf( "║  Pocet tahov: %-22d ║%n", moveCount);
         System.out.println("╚══════════════════════════════════════╝");
     }
 
-    private int getUserInput()
+    private String getUserInput(String playerName)
     {
         while (true)
         {
@@ -291,17 +327,31 @@ public class ConsoleUI
                 }
             }
             System.out.println();
-            System.out.print("  Zadajte ID bloku: ");
+            System.out.print("  ID bloku / [comment] / [rating]: ");
 
-            if (!scanner.hasNextInt())
+            String input = scanner.nextLine().trim();
+
+            if (input.equalsIgnoreCase("comment") || input.equalsIgnoreCase("rating"))
             {
-                System.out.println("  Neplatny vstup. Zadajte cislo.");
-                scanner.nextLine();
+                return input;
+            }
+
+            if (input.isEmpty())
+            {
+                System.out.println("  Neplatny vstup. Zadajte cislo alebo prikaz.");
                 continue;
             }
 
-            int id = scanner.nextInt();
-            scanner.nextLine();
+            int id;
+            try
+            {
+                id = Integer.parseInt(input);
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println("  Neznamy prikaz. Zadajte cislo, 'comment' alebo 'rating'.");
+                continue;
+            }
 
             boolean valid = false;
             for (Piece piece : field.getPieces())
@@ -319,7 +369,7 @@ public class ConsoleUI
                 continue;
             }
 
-            return id;
+            return String.valueOf(id);
         }
     }
 }

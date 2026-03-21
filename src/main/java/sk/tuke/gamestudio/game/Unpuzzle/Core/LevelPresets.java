@@ -23,10 +23,14 @@ public class LevelPresets
     {
         Level level = new Level(1, "Kríž  (3×3,  4 bloky)", 3, 3);
 
+        level.addPiece(0, 0, Direction.RIGHT);
         level.addPiece(0, 1, Direction.UP);
+        level.addPiece(0, 2, Direction.RIGHT);
         level.addPiece(1, 0, Direction.LEFT);
-        level.addPiece(1, 2, Direction.RIGHT);
-        level.addPiece(2, 1, Direction.DOWN);
+        level.addPiece(1, 2, Direction.LEFT);
+        level.addPiece(2, 0, Direction.LEFT);
+        level.addPiece(2, 1, Direction.UP);
+        level.addPiece(2, 2, Direction.UP);
 
         level.seal();
         return level;
@@ -36,18 +40,18 @@ public class LevelPresets
     {
         Level level = new Level(2, "Skupiny  (4×6, 10 blokov)", 4, 6);
 
-        level.addPiece(0, 0, Direction.UP);
-        level.addPiece(1, 0, Direction.DOWN);
+        level.addPiece(0, 0, Direction.RIGHT);
+        level.addPiece(1, 0, Direction.LEFT);
 
-        level.addPiece(0, 2, Direction.UP);
-        level.addPiece(0, 3, Direction.UP);
+        level.addPiece(0, 2, Direction.DOWN);
+        level.addPiece(0, 3, Direction.RIGHT);
         level.addPiece(1, 2, Direction.DOWN);
-        level.addPiece(1, 3, Direction.DOWN);
-        level.addPiece(2, 2, Direction.DOWN);
+        level.addPiece(1, 3, Direction.LEFT);
+        level.addPiece(2, 2, Direction.LEFT);
         level.addPiece(2, 3, Direction.DOWN);
 
-        level.addPiece(0, 5, Direction.UP);
-        level.addPiece(1, 5, Direction.DOWN);
+        level.addPiece(0, 5, Direction.DOWN);
+        level.addPiece(1, 5, Direction.LEFT);
 
         level.seal();
         return level;
@@ -57,18 +61,18 @@ public class LevelPresets
     {
         Level level = new Level(3, "Podkova  (4×4, 10 blokov)", 4, 4);
 
-        level.addPiece(0, 0, Direction.LEFT);
-        level.addPiece(0, 3, Direction.RIGHT);
-        level.addPiece(1, 0, Direction.LEFT);
-        level.addPiece(1, 3, Direction.RIGHT);
+        level.addPiece(0, 0, Direction.DOWN);
+        level.addPiece(0, 3, Direction.LEFT);
+        level.addPiece(1, 0, Direction.DOWN);
+        level.addPiece(1, 3, Direction.DOWN);
 
-        level.addPiece(2, 0, Direction.DOWN);
+        level.addPiece(2, 0, Direction.RIGHT);
         level.addPiece(2, 1, Direction.DOWN);
-        level.addPiece(2, 2, Direction.DOWN);
+        level.addPiece(2, 2, Direction.UP);
         level.addPiece(2, 3, Direction.DOWN);
 
-        level.addPiece(3, 1, Direction.DOWN);
-        level.addPiece(3, 2, Direction.DOWN);
+        level.addPiece(3, 1, Direction.RIGHT);
+        level.addPiece(3, 2, Direction.UP);
 
         level.seal();
         return level;
@@ -78,25 +82,25 @@ public class LevelPresets
     {
         Level level = new Level(4, "Mriežka  (4×4, 16 blokov)", 4, 4);
 
-        level.addPiece(0, 0, Direction.UP);
-        level.addPiece(0, 1, Direction.UP);
-        level.addPiece(0, 2, Direction.UP);
+        level.addPiece(0, 0, Direction.RIGHT);
+        level.addPiece(0, 1, Direction.RIGHT);
+        level.addPiece(0, 2, Direction.DOWN);
         level.addPiece(0, 3, Direction.UP);
 
-        level.addPiece(1, 0, Direction.LEFT);
-        level.addPiece(1, 1, Direction.LEFT);
-        level.addPiece(1, 2, Direction.RIGHT);
-        level.addPiece(1, 3, Direction.RIGHT);
+        level.addPiece(1, 0, Direction.UP);
+        level.addPiece(1, 1, Direction.RIGHT);
+        level.addPiece(1, 2, Direction.DOWN);
+        level.addPiece(1, 3, Direction.UP);
 
-        level.addPiece(2, 0, Direction.LEFT);
+        level.addPiece(2, 0, Direction.UP);
         level.addPiece(2, 1, Direction.LEFT);
         level.addPiece(2, 2, Direction.RIGHT);
-        level.addPiece(2, 3, Direction.RIGHT);
+        level.addPiece(2, 3, Direction.DOWN);
 
-        level.addPiece(3, 0, Direction.DOWN);
-        level.addPiece(3, 1, Direction.DOWN);
+        level.addPiece(3, 0, Direction.LEFT);
+        level.addPiece(3, 1, Direction.LEFT);
         level.addPiece(3, 2, Direction.DOWN);
-        level.addPiece(3, 3, Direction.DOWN);
+        level.addPiece(3, 3, Direction.LEFT);
 
         level.seal();
         return level;
