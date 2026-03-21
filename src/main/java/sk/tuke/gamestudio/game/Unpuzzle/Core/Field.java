@@ -11,7 +11,7 @@ public class Field
     private final int cols;
     private final Piece[][] grid;
     private final List<Piece> pieces;
-        private final String levelName;
+        //private final String levelName;
     private GameState gameState;
 
 
@@ -21,20 +21,10 @@ public class Field
         this.cols = level.getCols();
         this.grid = new Piece[rows][cols];
         this.pieces = new ArrayList<>();
-        this.levelName = "Level " + level.getNumber() + ":" + level.getName();
+        //this.levelName = "Level " + level.getNumber() + ":" + level.getName();
         this.gameState = GameState.PLAYING;
         loadlevel(level);
     }
-
-    /*public Field(int rows, int cols, int pieceCount)
-    {
-        this.rows = rows;
-        this.cols = cols;
-        this.grid = new Piece[rows][cols];
-        this.pieces = new ArrayList<>();
-        this.levelName = "Nahodna hra (" + rows + "x" + cols + ")";
-        this.gameState = GameState.PLAYING;
-    }*/
 
     private void loadlevel(Level level)
     {
@@ -48,7 +38,6 @@ public class Field
         }
 
     }
-
 
     public boolean removePiece(int id)
     {

@@ -1,7 +1,6 @@
 package sk.tuke.gamestudio.game.Unpuzzle.Core;
 
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FieldTest
@@ -15,8 +14,8 @@ public class FieldTest
     public void testFieldInitializesWithCorrectPieceCount()
     {
         Field field = createLevel1();
-        assertEquals(4, field.getPieces().size(),
-                "Level 1 musí mať 4 bloky.");
+        assertEquals(8, field.getPieces().size(),
+                "Level 1 musí mať 8 blokov.");
     }
 
     @Test
@@ -42,12 +41,15 @@ public class FieldTest
     public void testPiecesPlacedAtCorrectPositions()
     {
         Field field = createLevel1();
-        assertNotNull(field.getPieceAt(0, 1), "Na pozícii (0,1) musí byť blok.");
-        assertNotNull(field.getPieceAt(1, 0), "Na pozícii (1,0) musí byť blok.");
-        assertNotNull(field.getPieceAt(1, 2), "Na pozícii (1,2) musí byť blok.");
-        assertNotNull(field.getPieceAt(2, 1), "Na pozícii (2,1) musí byť blok.");
-        assertNull(field.getPieceAt(0, 0), "Na pozícii (0,0) nesmie byť blok.");
-        assertNull(field.getPieceAt(1, 1), "Na pozícii (1,1) nesmie byť blok.");
+        assertNotNull(field.getPieceAt(0, 0));
+        assertNotNull(field.getPieceAt(0, 1));
+        assertNotNull(field.getPieceAt(0, 2));
+        assertNotNull(field.getPieceAt(1, 0));
+        assertNotNull(field.getPieceAt(1, 2));
+        assertNotNull(field.getPieceAt(2, 0));
+        assertNotNull(field.getPieceAt(2, 1));
+        assertNotNull(field.getPieceAt(2, 2));
+        assertNull(field.getPieceAt(1, 1), "Stred (1,1) musí byť prázdny.");
     }
 
     @Test
@@ -59,102 +61,135 @@ public class FieldTest
     }
 
     @Test
-    public void testAllLevel1PiecesAreNotBlocked()
+    public void testFreeBlockIsNotBlocked()
     {
         Field field = createLevel1();
-        for (Piece piece : field.getPieces())
-        {
-            assertFalse(field.isBlocked(piece), "Blok " + piece.getId() + " nesmie byť zablokovaný v Level 1.");
-        }
+        Piece p2 = field.getPieceAt(0, 1);
+        assertNotNull(p2);
+        assertFalse(field.isBlocked(p2), "p2(0,1) UP musí byť voľný.");
     }
 
     @Test
-    public void testBlockedPieceInLevel3()
+    public void testBlockedByDirectNeighbour()
     {
-        Field field = new Field(LevelPresets.getLevel(3));
-        Piece p6 = field.getPieceAt(2, 1);
-        assertNotNull(p6, "Blok na (2,1) musí existovať.");
-        assertTrue(field.isBlocked(p6),
-                "Blok na (2,1) smer DOWN musí byť zablokovaný blokom na (3,1).");
+        Field field = createLevel1();
+        Piece p5 = field.getPieceAt(1, 2);
+        assertNotNull(p5);
+        assertTrue(field.isBlocked(p5), "p5(1,2) LEFT musí byť zablokovaný p4(1,0).");
     }
 
     @Test
-    public void testRemovePieceSuccess()
+    public void testBlockedByNonAdjacentPiece()
     {
         Field field = createLevel1();
-        boolean result = field.removePiece(1);
-        assertTrue(result, "removePiece(1) musí vrátiť true pre voľný blok.");
+        Piece p1 = field.getPieceAt(0, 0);
+        assertNotNull(p1);
+        assertTrue(field.isBlocked(p1), "p1(0,0) RIGHT musí byť zablokovaný p2(0,1).");
     }
 
     @Test
-    public void testRemovePieceChangesState()
+    public void testRemovingBlockerFreesOtherPiece()
     {
         Field field = createLevel1();
-        field.removePiece(1);
-        Piece piece = field.getPieces().get(0);
-        assertEquals(PieceState.REMOVED, piece.getState(),
+        Piece p4 = field.getPieceAt(1, 0);
+        Piece p5 = field.getPieceAt(1, 2);
+
+        assertTrue(field.isBlocked(p5), "p5 musí byť zablokovaný pred odstránením p4.");
+        field.removePiece(p4.getId());
+        assertFalse(field.isBlocked(p5), "p5 musí byť voľný po odstránení p4.");
+    }
+
+    @Test
+    public void testRemoveFreePieceReturnsTrue()
+    {
+        Field field = createLevel1();
+        Piece p2 = field.getPieceAt(0, 1);
+        assertTrue(field.removePiece(p2.getId()),
+                "Odstránenie voľného bloku musí vrátiť true.");
+    }
+
+    @Test
+    public void testRemoveBlockedPieceReturnsFalse()
+    {
+        Field field = createLevel1();
+        Piece p5 = field.getPieceAt(1, 2);
+        assertFalse(field.removePiece(p5.getId()),
+                "Odstránenie zablokovaného bloku musí vrátiť false.");
+    }
+
+    @Test
+    public void testRemovePieceChangesStateToRemoved()
+    {
+        Field field = createLevel1();
+        Piece p2 = field.getPieceAt(0, 1);
+        field.removePiece(p2.getId());
+        assertEquals(PieceState.REMOVED, p2.getState(),
                 "Blok po odstránení musí mať stav REMOVED.");
     }
 
     @Test
-    public void testRemovePieceClearsGrid()
+    public void testRemovePieceClearsGridCell()
     {
         Field field = createLevel1();
-        assertNotNull(field.getPieceAt(0, 1));
-        field.removePiece(1);
+        Piece p2 = field.getPieceAt(0, 1);
+        assertNotNull(p2);
+        field.removePiece(p2.getId());
         assertNull(field.getPieceAt(0, 1),
-                "Po odstránení bloku musí byť pozícia v mriežke null.");
+                "Po odstránení musí byť bunka v mriežke null.");
     }
 
     @Test
-    public void testRemoveBlockedPieceFails()
-    {
-        Field field = new Field(LevelPresets.getLevel(3));
-        Piece p6 = field.getPieceAt(2, 1);
-        assertNotNull(p6);
-        boolean result = field.removePiece(p6.getId());
-        assertFalse(result, "Zablokovaný blok nesmie byť odstránený.");
-        assertEquals(PieceState.ON_BOARD, p6.getState(),
-                "Zablokovaný blok musí zostať ON_BOARD.");
-    }
-
-    @Test
-    public void testRemoveNonExistentPieceFails()
+    public void testRemoveNonExistentPieceReturnsFalse()
     {
         Field field = createLevel1();
-        boolean result = field.removePiece(999);
-        assertFalse(result, "Pokus o odstránenie neexistujúceho bloku musí vrátiť false.");
+        assertFalse(field.removePiece(999),
+                "Pokus o odstránenie neexistujúceho ID musí vrátiť false.");
     }
 
     @Test
-    public void testRemoveAlreadyRemovedPieceFails()
+    public void testRemoveAlreadyRemovedPieceReturnsFalse()
     {
         Field field = createLevel1();
-        field.removePiece(1);
-        boolean result = field.removePiece(1);
-        assertFalse(result, "Pokus o druhé odstránenie toho istého bloku musí vrátiť false.");
-    }
-
-    @Test
-    public void testGameStateSolvedWhenAllRemoved()
-    {
-        Field field = createLevel1();
-        field.removePiece(1);
-        field.removePiece(2);
-        field.removePiece(3);
-        field.removePiece(4);
-        assertEquals(GameState.SOLVED, field.getGameState(),
-                "Stav hry musí byť SOLVED keď sú všetky bloky odstránené.");
+        Piece p2 = field.getPieceAt(0, 1);
+        field.removePiece(p2.getId());
+        assertFalse(field.removePiece(p2.getId()),
+                "Druhý pokus o odstránenie toho istého bloku musí vrátiť false.");
     }
 
     @Test
     public void testGameStateRemainsPlayingAfterPartialRemoval()
     {
         Field field = createLevel1();
-        field.removePiece(1);
-        field.removePiece(2);
+        Piece p2 = field.getPieceAt(0, 1);
+        field.removePiece(p2.getId());
         assertEquals(GameState.PLAYING, field.getGameState(),
                 "Stav hry musí zostať PLAYING kým nie sú všetky bloky odstránené.");
+    }
+
+    @Test
+    public void testGameStateSolvedWhenAllRemoved()
+    {
+        Field field = createLevel1();
+        Piece p2 = field.getPieceAt(0, 1);
+        Piece p3 = field.getPieceAt(0, 2);
+        Piece p1 = field.getPieceAt(0, 0);
+        Piece p4 = field.getPieceAt(1, 0);
+        Piece p5 = field.getPieceAt(1, 2);
+        Piece p6 = field.getPieceAt(2, 0);
+        Piece p7 = field.getPieceAt(2, 1);
+        Piece p8 = field.getPieceAt(2, 2);
+
+        assertTrue(field.removePiece(p2.getId()));
+        assertTrue(field.removePiece(p3.getId()));
+        assertTrue(field.removePiece(p1.getId()));
+        assertTrue(field.removePiece(p4.getId()));
+        assertTrue(field.removePiece(p5.getId()));
+        assertTrue(field.removePiece(p6.getId()));
+        assertTrue(field.removePiece(p7.getId()));
+        assertTrue(field.removePiece(p8.getId()));
+
+        assertEquals(GameState.SOLVED, field.getGameState(),
+                "Stav hry musí byť SOLVED keď sú všetky bloky odstránené.");
     }
 
     @Test
@@ -163,5 +198,21 @@ public class FieldTest
         Field field = new Field(LevelPresets.getLevel(4));
         assertEquals(16, field.getPieces().size(),
                 "Level 4 musí mať 16 blokov.");
+    }
+
+    @Test
+    public void testLevel2HasCorrectDimensions()
+    {
+        Field field = new Field(LevelPresets.getLevel(2));
+        assertEquals(4, field.getRows());
+        assertEquals(4, field.getCols());
+    }
+
+    @Test
+    public void testLevel3HasCorrectDimensions()
+    {
+        Field field = new Field(LevelPresets.getLevel(3));
+        assertEquals(4, field.getRows());
+        assertEquals(6, field.getCols());
     }
 }

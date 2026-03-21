@@ -13,9 +13,11 @@ import sk.tuke.gamestudio.service.ScoreService;
 
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
+
 
 public class ConsoleUI
 {
@@ -27,12 +29,6 @@ public class ConsoleUI
     private final ScoreService scoreService;
     private final CommentService commentService;
     private final RatingService ratingService;
-
-    /*public ConsoleUI(Field field, Scanner scanner)
-    {
-        this.field = field;
-        this.scanner = scanner;
-    }*/
 
     public ConsoleUI(Field field, Scanner scanner,
                      ScoreService scoreService,
@@ -46,27 +42,18 @@ public class ConsoleUI
         this.ratingService = ratingService;
     }
 
-    /*public ConsoleUI(Field field, Scanner scanner)
-    {
-        this(field, scanner, null, null, null);
-    }
-
-
-    public ConsoleUI(Field field)
-    {
-        this(field, new Scanner(System.in), null, null, null);
-    }*/
-
     public void run(String playerName)
     {
         int moveCount = 0;
+        int totalPoints = 0;
 
         while (field.getGameState() == GameState.PLAYING)
         {
             printField();
-            printLiveScore(moveCount);
+            printLiveScore(totalPoints, moveCount);
+            long moveStart = System.currentTimeMillis();
 
-            String input = getUserInput(playerName);
+            String input = getUserInput(/*playerName*/);
 
             if (input.equalsIgnoreCase("comment"))
             {
@@ -89,6 +76,10 @@ public class ConsoleUI
             }
             else
             {
+                long moveSeconds = (System.currentTimeMillis() - moveStart) / 1000;
+                int pointsForMove = calculatePointsForMove(moveSeconds);
+                totalPoints += pointsForMove;
+
                 moveCount++;
                 System.out.println("  Blok " + id + " bol odstraneny. (tah c." + moveCount + ")");
             }
@@ -96,39 +87,33 @@ public class ConsoleUI
         }
 
         printField();
-        printResult(moveCount);
+        printResult(moveCount, totalPoints);
 
-        int removed = (int) field.getPieces().stream()
-                .filter(p -> p.getState() == PieceState.REMOVED)
-                .count();
-        int points = calculatePoints((int) removed);
-
-        //int points = calculatePoints(field.getPieces().size(), moveCount);
-        saveScore(playerName, points);
+        saveScore(playerName, totalPoints);
         showTopScores();
         askForComment(playerName);
         askForRating(playerName);
         showAverageRating();
     }
 
-    private void printLiveScore(int moveCount)
+    private void printLiveScore(int totalPoints, int moveCount)
     {
-        int removed = (int) field.getPieces().stream()
-                .filter(p -> p.getState() == PieceState.REMOVED)
+        int remaining = (int) field.getPieces().stream()
+                .filter(p -> p.getState() == PieceState.ON_BOARD)
                 .count();
-        int currentPoints = calculatePoints(removed);
 
-        int remaining = field.getPieces().size() - removed;
-        System.out.println("  Aktualne skore: " + currentPoints
-                + "b  |  Tahy: " + moveCount
+        System.out.println("  Skore: " + totalPoints + "b"
+                + "  |  Tahy: " + moveCount
                 + "  |  Zostatok blokov: " + remaining);
         System.out.println();
     }
 
-
-    private int calculatePoints(int removeCount)
+    private int calculatePointsForMove(long seconds)
     {
-        return removeCount * 10;
+        if (seconds <= 3)  return 20;
+        if (seconds <= 6)  return 15;
+        if (seconds <= 10) return 10;
+        return 5;
     }
 
     private void saveScore(String player, int points)
@@ -154,19 +139,27 @@ public class ConsoleUI
         {
             List<Score> top = scoreService.getTopScores(GAME_NAME);
             System.out.println();
-            System.out.println("  === TOP 10 SKORE ===");
+            System.out.println("  ╔════╦════════════════════╦════════╦═════════════════════╗");
+            System.out.println("  ║ #  ║ Hráč               ║  Body  ║ Dátum               ║");
+            System.out.println("  ╠════╬════════════════════╬════════╬═════════════════════╣");
+
             if (top.isEmpty())
             {
-                System.out.println("  Zatial ziadne skore.");
+                System.out.println("  ║         Zatial ziadne skore.                         ║");
             }
             else
             {
                 int rank = 1;
                 for (Score s : top)
                 {
-                    System.out.printf("  %2d. %s%n", rank++, s);
+                    System.out.printf("  ║ %-2d ║ %-18s ║ %6d ║ %-19s ║%n",
+                            rank++,
+                            truncate(s.getPlayer(), 18),
+                            s.getPoints(),
+                            formatDate(s.getPlayedOn()));
                 }
             }
+            System.out.println("  ╚════╩════════════════════╩════════╩═════════════════════╝");
             System.out.println();
         }
         catch (Exception e)
@@ -175,10 +168,24 @@ public class ConsoleUI
         }
     }
 
+    private String truncate(String text, int maxLen)
+    {
+        if (text == null) return "";
+        return text.length() <= maxLen ? text : text.substring(0, maxLen - 2) + "..";
+    }
+
+    private String formatDate(java.util.Date date)
+    {
+        if (date == null) return "-";
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);
+    }
+
+
     private void askForComment(String player)
     {
         if (commentService == null) return;
         System.out.print("  Chcete pridat komentar? (Enter = preskocit): ");
+        System.out.flush();
         String text = scanner.nextLine().trim();
         if (text.isEmpty()) return;
 
@@ -240,6 +247,7 @@ public class ConsoleUI
         catch (Exception ignored) {}
 
         System.out.print("  Ohodnotte hru (1-5, Enter = preskocit): ");
+        System.out.flush();
         String input = scanner.nextLine().trim();
         if (input.isEmpty()) return;
 
@@ -249,6 +257,7 @@ public class ConsoleUI
             if (stars < 1 || stars > 5)
             {
                 System.out.println("  Neplatne hodnotenie. Zadajte cislo od 1 do 5.");
+                System.out.flush();
                 return;
             }
             Rating rating = new Rating(player, GAME_NAME, stars, Timestamp.valueOf(LocalDateTime.now()));
@@ -304,17 +313,19 @@ public class ConsoleUI
         System.out.println("  +" + "------".repeat(field.getCols()) + "+");
     }
 
-    private void printResult(int moveCount)
+    private void printResult(int moveCount, int totalPoints)
     {
         System.out.println("╔══════════════════════════════════════╗");
         System.out.println("║       GRATULUJEME! VYHRALI STE!      ║");
         System.out.println("╠══════════════════════════════════════╣");
         System.out.printf( "║  %-36s║%n", "Vsetky bloky odstranene.");
-        System.out.printf( "║  Pocet tahov: %-22d ║%n", moveCount);
+        System.out.printf( "║  Pocet tahov:   %-21d║%n", moveCount);
+        System.out.printf( "║  Celkove skore: %-21d║%n", totalPoints);
         System.out.println("╚══════════════════════════════════════╝");
+
     }
 
-    private String getUserInput(String playerName)
+    private String getUserInput(/*String playerName*/)
     {
         while (true)
         {
@@ -328,6 +339,7 @@ public class ConsoleUI
             }
             System.out.println();
             System.out.print("  ID bloku / [comment] / [rating]: ");
+            System.out.flush();
 
             String input = scanner.nextLine().trim();
 
@@ -365,7 +377,7 @@ public class ConsoleUI
 
             if (!valid)
             {
-                System.out.println("  Blok c." + id + " neexistuje alebo je uz odstraneny.");
+                System.out.println("  Blok c." + id + " neexistuje.");
                 continue;
             }
 

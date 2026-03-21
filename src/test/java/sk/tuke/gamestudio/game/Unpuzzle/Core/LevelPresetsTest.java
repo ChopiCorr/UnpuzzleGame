@@ -5,12 +5,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LevelPresetsTest
 {
-
     @Test
-    public void testLevel1HasFourPieces()
+    public void testLevel1HasEightPieces()
     {
         Level level = LevelPresets.getLevel(1);
-        assertEquals(4, level.getPieceCount(), "Level 1 musí mať 4 bloky.");
+        assertEquals(8, level.getPieceCount(), "Level 1 musí mať 8 blokov.");
     }
 
     @Test
@@ -35,7 +34,7 @@ public class LevelPresetsTest
     }
 
     @Test
-    public void testLevel1Dimensions()
+    public void testLevel1Is3x3()
     {
         Level level = LevelPresets.getLevel(1);
         assertEquals(3, level.getRows());
@@ -43,20 +42,47 @@ public class LevelPresetsTest
     }
 
     @Test
-    public void testLevel2Dimensions()
+    public void testLevel2Is4x4()
     {
         Level level = LevelPresets.getLevel(2);
+        assertEquals(4, level.getRows());
+        assertEquals(4, level.getCols());
+    }
+
+    @Test
+    public void testLevel3Is4x6()
+    {
+        Level level = LevelPresets.getLevel(3);
         assertEquals(4, level.getRows());
         assertEquals(6, level.getCols());
     }
 
     @Test
-    public void testLevel3And4AreSquare()
+    public void testLevel4Is4x4()
     {
-        Level level3 = LevelPresets.getLevel(3);
-        Level level4 = LevelPresets.getLevel(4);
-        assertEquals(level3.getRows(), level3.getCols(), "Level 3 musí byť štvorcový.");
-        assertEquals(level4.getRows(), level4.getCols(), "Level 4 musí byť štvorcový.");
+        Level level = LevelPresets.getLevel(4);
+        assertEquals(4, level.getRows());
+        assertEquals(4, level.getCols());
+    }
+
+    @Test
+    public void testSquareLevels()
+    {
+        // Level 1, 2, 4 sú štvorcové
+        Level l1 = LevelPresets.getLevel(1);
+        Level l2 = LevelPresets.getLevel(2);
+        Level l4 = LevelPresets.getLevel(4);
+        assertEquals(l1.getRows(), l1.getCols(), "Level 1 musí byť štvorcový.");
+        assertEquals(l2.getRows(), l2.getCols(), "Level 2 musí byť štvorcový.");
+        assertEquals(l4.getRows(), l4.getCols(), "Level 4 musí byť štvorcový.");
+    }
+
+    @Test
+    public void testLevel3IsNotSquare()
+    {
+        Level l3 = LevelPresets.getLevel(3);
+        assertNotEquals(l3.getRows(), l3.getCols(),
+                "Level 3 (Skupiny 4x6) nesmie byť štvorcový.");
     }
 
     @Test
@@ -82,7 +108,7 @@ public class LevelPresetsTest
     public void testSealedLevelCannotAddPiece()
     {
         Level level = LevelPresets.getLevel(1);
-            assertThrows(IllegalStateException.class, () ->
+        assertThrows(IllegalStateException.class, () ->
                         level.addPiece(0, 0, Direction.UP),
                 "Zapečatený level nesmie dovoliť pridávanie blokov.");
     }
@@ -118,4 +144,3 @@ public class LevelPresetsTest
         }
     }
 }
-
