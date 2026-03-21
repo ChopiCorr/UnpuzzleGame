@@ -212,18 +212,25 @@ public class ConsoleUI
         {
             List<Comment> comments = commentService.getComments(GAME_NAME);
             System.out.println();
-            System.out.println("  === POSLEDNE KOMENTARE ===");
+            System.out.println("  ╔════════════════════╦══════════════════════════════════════════╦═════════════════════╗");
+            System.out.println("  ║ Hráč               ║ Komentár                                 ║ Dátum               ║");
+            System.out.println("  ╠════════════════════╬══════════════════════════════════════════╬═════════════════════╣");
+
             if (comments.isEmpty())
             {
-                System.out.println("  Zatial ziadne komentare.");
+                System.out.println("  ║                        Zatial ziadne komentare.                                 ║");
             }
             else
             {
                 for (Comment c : comments)
                 {
-                    System.out.println("  " + c);
+                    System.out.printf("  ║ %-18s ║ %-40s ║ %-19s ║%n",
+                            truncate(c.getPlayer(), 18),
+                            truncate(c.getComment(), 40),
+                            formatDate(c.getCommentedOn()));
                 }
             }
+            System.out.println("  ╚════════════════════╩══════════════════════════════════════════╩═════════════════════╝");
             System.out.println();
         }
         catch (Exception e)
@@ -282,6 +289,7 @@ public class ConsoleUI
             int avg = ratingService.getAverageRating(GAME_NAME);
             System.out.println("  Priemerne hodnotenie hry Unpuzzle: " + avg + "/5");
             System.out.println();
+            System.out.flush();
         }
         catch (Exception e)
         {
@@ -325,7 +333,7 @@ public class ConsoleUI
 
     }
 
-    private String getUserInput(/*String playerName*/)
+    private String getUserInput()
     {
         while (true)
         {

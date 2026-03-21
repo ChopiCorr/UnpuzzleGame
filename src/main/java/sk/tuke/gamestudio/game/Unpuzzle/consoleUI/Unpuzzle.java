@@ -29,13 +29,29 @@ public class Unpuzzle
             System.out.println("  [WARN] Databaza nie je dostupna. Hra bezi bez sluzieb.");
             System.out.println("  [WARN] " + e.getMessage());
         }
-
         printBanner();
 
-        System.out.print("Zadajte svoje meno: ");
-        String playerName = scanner.nextLine().trim();
-        if (playerName.isEmpty()) playerName = "Anonymous";
-        if (playerName.length() > 64) playerName = playerName.substring(0, 64);
+
+
+        //System.out.print("Zadajte svoje meno: ");
+        //String playerName = scanner.nextLine().trim();
+
+        String playerName = "";
+        while (playerName.isEmpty()) {
+            System.out.print("Zadajte svoje meno: ");
+            System.out.flush();
+            playerName = scanner.nextLine().trim();
+
+            if (playerName.equalsIgnoreCase("wipe")) {
+                wipeAllData(scoreService, commentService, ratingService);
+                playerName = "";
+                continue;
+            }
+
+
+            if (playerName.isEmpty()) playerName = "Anonymous";
+            if (playerName.length() > 64) playerName = playerName.substring(0, 64);
+        }
         System.out.println();
 
         int choice = selectLevel(scanner);
@@ -58,6 +74,24 @@ public class Unpuzzle
         System.out.println("Dakujeme za hru! Zbohom.");
         scanner.close();
     }
+
+    private static void wipeAllData(ScoreService scoreService,
+                                    CommentService commentService,
+                                    RatingService ratingService)
+    {
+        try
+        {
+            if (scoreService   != null) scoreService.reset();
+            if (commentService != null) commentService.reset();
+            if (ratingService  != null) ratingService.reset();
+            System.out.println("  [WIPE] Vsetky data boli vymazane.");
+        }
+        catch (Exception e)
+        {
+            System.out.println("  [WIPE] Chyba pri mazani dat: " + e.getMessage());
+        }
+    }
+
 
     private static void printBanner()
     {
