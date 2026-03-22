@@ -1,0 +1,98 @@
+Unpuzzle
+
+1. Podstata a pravidlá hry
+Unpuzzle je logická hra pre jedného hráča ovládaná výhradne cez textovú konzolu. Herné pole je dvojrozmerná mriežka obsadená blokmi. Každý blok má priradený smer pohybu vyznačený šípkou: hore (↑), dole (↓), doľava (←) alebo doprava (→). Cieľom hráča je odstrániť všetky bloky z poľa.
+Blok možno odstrániť iba vtedy, keď je jeho cesta v smere šípky úplne voľná — žiadny iný blok nesmie stáť na jeho dráhe až po okraj poľa. Ak je cesta zablokovaná, ťah je zamietnutý a hra pokračuje. Hra je vyhrata, keď na poli nezostane žiadny blok.
+Projekt obsahuje štyri preddefinované levely s rôznou topológiou blokovania a rastúcou náročnosťou.
+2. Priebeh hry — herný cyklus
+Spustenie aplikácie prebieha cez triedu Unpuzzle (metóda main). Nasleduje postupnosť krokov, ktorá tvorí herný cyklus:
+
+2.1 Inicializácia a prihlásenie
+Pri štarte sa aplikácia pokúsi pripojiť k PostgreSQL databáze a inicializovať tri JDBC služby. Ak pripojenie zlyhá, hra pokračuje bez databázových funkcií — hráč o tom dostane upozornenie. Následne sa zobrazí banner a hráč je požiadaný o zadanie mena.
+Špeciálny príkaz 'wipe' zadaný namiesto mena vymaže všetky záznamy zo všetkých troch databázových tabuliek (score, comment, rating) bez ďalšieho upozornenia. Ide o administratívnu funkciu určenú pre správu testovacích dát.
+2.2 Výber levelu a inicializácia poľa
+Hráč vyberie jeden zo štyroch levelov. Trieda LevelPresets vráti príslušný objekt Level obsahujúci rozmery poľa a zoznam definícií blokov (PieceDefinition). Trieda Field prevezmie tento Level, vytvorí dvojrozmernú mriežku Piece[][] a naplní ju blokmi — každý dostane jedinečné ID podľa poradia v definícii.
+2.3 Hlavný herný cyklus
+ConsoleUI spustí cyklus while, ktorý beží pokiaľ Field.getGameState() vracia PLAYING. V každej iterácii sa:
+•	Vykreslí aktuálne herné pole — metóda printField() prechádza mriežku a vypisuje každý blok vo formáte [ID šípka] alebo prázdnu bunku [    ].
+•	Zobrazí live skóre — počet aktuálnych bodov, počet ťahov a zostatok blokov na poli.
+•	Zaznamená čas začiatku ťahu pomocou System.currentTimeMillis().
+•	Načíta vstup od hráča — getUserInput() akceptuje ID bloku, príkaz 'comment' alebo 'rating'.
+Ak hráč zadá 'comment' alebo 'rating', ServiceHandler spracuje interakciu so službou a ConsoleUI zobrazí aktualizované dáta. Hra ďalej pokračuje bez prerušenia.
+Ak hráč zadá číslo, ConsoleUI zavolá Field.removePiece(id). Field overí existenciu bloku, jeho stav (ON_BOARD) a pomocou isBlocked() skontroluje cestu v smere šípky. Pri úspešnom ťahu sa bunka v mriežke nastaví na null, stav bloku sa zmení na REMOVED a vypočítajú sa body podľa času ťahu.
+2.4 Ukončenie hry a vyhodnotenie
+Po každom úspešnom ťahu Field.checkGameState() prejde všetky bloky. Ak žiadny nie je ON_BOARD, stav sa zmení na SOLVED a cyklus sa ukončí. ConsoleUI zobrazí víťazná obrazovka s počtom ťahov a celkovým skóre.
+Nasleduje séria post-game akcií: uloženie skóre do databázy, zobrazenie tabuľky TOP 10, ponuka komentára a hodnotenia. Hráč sa môže rozhodnúť hrať znova — vytvorí sa nový Field a cyklus sa opakuje s tým istým menom hráča.
+
+3. Architektúra projektu
+Projekt je striktne rozdelený do vrstiev, pričom každá vrstva komunikuje len s tou priamo pod ňou. Táto jednosmerná závislosť zabraňuje vzniku špagety-kódu a umožňuje nezávislú výmenu komponentov.
+
+3.1 Vrstva Core — herná logika
+Balík game.Unpuzzle.Core obsahuje všetku hernú logiku. Táto vrstva neobsahuje ani jeden riadok kódu súvisiaceho s konzolou, databázou alebo vstupom/výstupom. Môže byť testovaná a používaná úplne nezávisle od zvyšku aplikácie.
+
+Field	Centrálna trieda hernej logiky. Uchováva dvojrozmernú mriežku Piece[][] a zoznam všetkých blokov. Metóda removePiece(id) realizuje celý herný ťah: nájde blok, overí blokovanie, aktualizuje mriežku a skontroluje stav hry.
+Piece	Reprezentuje jeden blok na poli. Uchováva ID, riadok, stĺpec, smer (Direction) a stav (PieceState). Stav je mutable — mení sa z ON_BOARD na REMOVED pri úspešnom ťahu.
+Level	Dátový objekt pre konfiguráciu levelu. Po zavolaní seal() sa stane nemenným — ďalšie pokusy o pridanie blokov vyhodia IllegalStateException.
+LevelPresets	Továrenská trieda. Metóda getLevel(int) vracia jeden zo štyroch preddefinovaných levelov. Neplatné číslo vyhodí IllegalArgumentException.
+Direction	Enum s hodnotami UP, DOWN, LEFT, RIGHT. Každá hodnota má priradenú šípku cez metódu getSymbol() — napr. Direction.UP vracia reťazec ↑.
+PieceState	Enum: ON_BOARD (blok je na poli) a REMOVED (blok bol odstranenýúspešným ťahom).
+GameState	Enum: PLAYING (hra prebieha) a SOLVED (všetky bloky sú odstránené).
+
+3.2 Vrstva ConsoleUI — používateľské rozhranie
+Balík game.Unpuzzle.consoleUI obsahuje všetko, čo súvisí s komunikáciou s hráčom cez konzolu. Táto vrstva pozná Core vrstvu (pracuje s Field), ale nepristupuje k databáze priamo. Databázové operácie sú delegované na triedy ServiceHandler (zápis) a samotný ConsoleUI (zobrazenie).
+
+Unpuzzle	Main trieda. Inicializuje JDBC služby, spracuje meno hráča (vrátane príkazu 'wipe'), zobrazí menu levelov a riadi opakované hranie. Je vstupným bodom celej aplikácie.
+ConsoleUI	Trieda zodpovedná za všetok výstup do konzoly. Okrem výpisu herného poľa, live skóre a výsledku tiež zobrazuje tabuľky TOP 10 skóre, komentárov a priemerného hodnotenia. Obsahuje metódu getUserInput() pre bezpečné čítanie vstupu.
+ServiceHandler	Trieda zodpovedná za interakciu s databázovými službami. Spracuje uloženie skóre (saveScore), zapísanie komentára (askForComment) a hodnotenia (askForRating). Obsahuje tiež metódu calculatePointsForMove() pre bodovanie podľa rýchlosti ťahu.
+
+
+3.3 Vrstva Service — databázové služby
+Balíky entity a service tvoria databázovú vrstvu. Táto vrstva je navrhnutá podľa vzoru Interface + Implementation, čo umožňuje ľahkú výmenu implementácie bez zmeny zvyšku kódu.
+
+Score / Comment / Rating	Entity triedy — dátové objekty reprezentujúce jeden záznam v databázovej tabuľke. Obsahujú polia, gettery, settery a toString() pre účely ladenia.
+ScoreService / CommentService / RatingService	Rozhrania definujúce kontrakt: addScore, getTopScores, reset (resp. ekvivalenty pre Comment a Rating). ConsoleUI a ServiceHandler pracujú výhradne s týmito rozhraniami.
+ScoreServiceJDBC / ...	Konkrétne implementácie rozhraní cez JDBC. Každá metóda otvorí pripojenie k PostgreSQL, vykoná SQL príkaz (INSERT / SELECT / DELETE) a pripojenie zatvorí. Chyby sú zachytené a prekonvertované na vlastné výnimky (ScoreException atď.).
+
+4. Systém bodovania
+Body sa počítajú za každý úspešný ťah zvlášť na základe času, ktorý hráč strávil premýšľaním. Čas sa meria od zobrazenia výzvy na vstup po potvrdenie ťahu. Celkové skóre je súčtom bodov za všetky úspešné ťahy v danej partii.
+
+Čas ťahu	  Body za ťah	Hodnotenie
+0 – 3 sekundy	20 bodov	Rýchly ťah
+4 – 6 sekúnd	15 bodov	Priemerný ťah
+7 – 10 sekúnd	10 bodov	Pomalý ťah
+viac ako 10 s	5 bodov	Veľmi pomalý ťah
+
+Maximálne dosiahnuteľné skóre závisí od počtu blokov v leveli. Pre Level 4 (16 blokov, všetky ťahy do 3 sekúnd) je maximum 320 bodov. Skóre je uložené do databázy po každej úspešne dohratej partii.
+
+5. Testovanie
+Projekt obsahuje rozsiahlu sadu JUnit 5 testov rozdelenú do dvoch testovacích balíkov zodpovedajúcich štruktúre zdrojového kódu.
+
+5.1 Testy hernej logiky — balík game.Unpuzzle.Core
+
+FieldTest 	Inicializácia poľa, umiestnenie blokov na správnych pozíciách, blokovanie a odstraňovanie blokov, zmena stavu hry po poslednom ťahu, overenie riešiteľnosti levelu 1 v správnom poradí.
+PieceTest 	Inicializácia bloku, správny počiatočný stav ON_BOARD, zmena stavu, symboly smerov pre všetky štyri hodnoty Direction.
+LevelTest 	Inicializácia levelu, pridávanie blokov, zapečatenie (seal), nemodifikovateľnosť zoznamu po seal(), výnimka pri pokuse o pridanie bloku po seal().
+LevelPresetsTest	Správny počet blokov pre každý level, rozmery poľa, štvorcové a neštvorcové levely, výnimka pre neplatné číslo levelu, žiadne duplicitné pozície, všetky bloky v medziach poľa.
+
+5.2 Testy databázových služieb — balík service
+Testy pre každú službu používajú @BeforeEach a @AfterEach na vyčistenie tabuľky pred a po každom teste, čím sa zaručuje nezávislosť testov. Testy sa pripájajú k rovnakej databáze ako aplikácia — pre produkčné prostredie sa odporúča vytvoriť osobitnú testovaciu databázu.
+
+ScoreServiceTest 	Pridanie a načítanie skóre, zoradenie zostupne podľa bodov, limit 10 záznamov, filtrácia podľa názvu hry, reset tabuľky, prázdna tabuľka vráti prázdny zoznam.
+CommentServiceTest 	Pridanie a načítanie komentára, zoradenie od najnovšieho, limit 10 záznamov, filtrácia podľa hry, reset, prázdna tabuľka.
+RatingServiceTest  	Nastavenie a získanie hodnotenia, aktualizácia existujúceho hodnotenia (upsert), priemer dvoch hodnotení, nulový priemer pre prázdnu tabuľku, hodnotenie pre neexistujúceho hráča, reset, validácia rozsahu 1–5.
+
+5.3 Testy UI vrstvy — balík game.Unpuzzle.consoleUI
+UI testy používajú ByteArrayInputStream na simuláciu vstupu hráča a ByteArrayOutputStream na zachytenie výstupu do konzoly. Testy overujú správanie bez závislosti na databáze — služby sú predané ako null.
+
+ConsoleUITest 	Výpis herného poľa (orámovanie, šípky, prázdne bunky, počet riadkov), null-guard pre show metódy (žiadny výstup pri null službách), riešenie levelu 1 so správnym vstupom, spracovanie neplatného vstupu, zobrazenie víťaznej správy, live skóre a počtu ťahov.
+ServiceHandlerTest	Bodovanie pre všetky štyri rýchlostné pásma, všetky tri hraničné hodnoty (3/4s, 6/7s, 10/11s), null-guard pre saveScore a ask metódy (žiadna výnimka, žiadny výstup), správne hodnoty getterov pri null službách.
+UnpuzzleTest 	Spustenie main bez výnimky, zobrazenie bannera, menu levelov, výzva na meno, rozlúčková správa, spracovanie neplatnej voľby levelu, prázdne meno → Anonymous.
+
+
+6. Implementované bonusy
+•	Bodovanie podľa rýchlosti ťahu — štyri pásma (20 / 15 / 10 / 5 bodov) merané v sekundách.
+•	Live skóre — po každom ťahu sa v konzole zobrazuje aktuálny stav: body, počet ťahov, zostatok blokov.
+•	Skrytý príkaz 'wipe' — zadaním namiesto mena sa zmažú všetky záznamy v databáze.
+•	Tabuľkový výpis — TOP 10 skóre aj komentáre sú zobrazené v zarovnaných tabuľkách s rámčekom.
+•	Príkazy počas hry — 'comment' a 'rating' sú dostupné kedykoľvek, nielen po skončení partii.
+
