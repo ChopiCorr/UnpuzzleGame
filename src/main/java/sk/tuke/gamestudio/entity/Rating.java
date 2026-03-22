@@ -46,10 +46,4 @@ public class Rating
     {
         this.game = game;
     }
-
-    @Override
-    public String toString()
-    {
-        return String.format("%-20s : %d/5  (%s)", player, rating, ratedOn);
-    }
 }

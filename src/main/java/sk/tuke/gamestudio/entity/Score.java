@@ -39,15 +39,4 @@ public class Score
     public Date getPlayedOn() {
         return playedOn;
     }
-
-    @Override
-    public String toString() {
-        return "Score{" +
-                "game='" + game + '\'' +
-                ", player='" + player + '\'' +
-                ", points=" + points +
-                ", playedOn=" + playedOn +
-                '}';
-    }
-
 }

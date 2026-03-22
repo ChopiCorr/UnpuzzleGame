@@ -2,46 +2,36 @@ package sk.tuke.gamestudio.entity;
 
 import java.sql.Timestamp;
 
-public class Comment
-{
+public class Comment {
     private String player;
     private String game;
     private String comment;
     private Timestamp commentedOn;
 
-    public Comment(String player, String game, String comment, Timestamp commentedOn)
-    {
+    public Comment(String player, String game, String comment, Timestamp commentedOn) {
         this.player = player;
         this.game = game;
         this.comment = comment;
         this.commentedOn = commentedOn;
     }
 
-    public String getPlayer()
-    {
-        return player; }
+    public String getPlayer() {
+        return player;
+    }
 
-    public String getGame()
-    {
+    public String getGame() {
         return game;
     }
-    public String getComment()
-    {
+
+    public String getComment() {
         return comment;
     }
-    public Timestamp getCommentedOn()
-    {
+
+    public Timestamp getCommentedOn() {
         return commentedOn;
     }
 
-    public void setGame(String game)
-    {
+    public void setGame(String game) {
         this.game = game;
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("%-20s : %s  (%s)", player, comment, commentedOn);
     }
 }

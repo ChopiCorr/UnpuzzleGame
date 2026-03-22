@@ -12,7 +12,6 @@ public class RatingServiceJDBC implements RatingService
     public static final String SELECT_AVERAGE = "SELECT AVG(rating) FROM rating WHERE game = ?";
     public static final String SELECT_PLAYER  = "SELECT rating FROM rating WHERE game = ? AND player = ?";
     public static final String DELETE = "DELETE FROM rating";
-    // ON CONFLICT (player, game) – upsert: ak záznam existuje, aktualizuje ho
     public static final String UPSERT = "INSERT INTO rating (player, game, rating, ratedon) VALUES (?, ?, ?, ?) ON CONFLICT (player, game) DO UPDATE SET rating = EXCLUDED.rating, ratedon = EXCLUDED.ratedon";
 
     @Override

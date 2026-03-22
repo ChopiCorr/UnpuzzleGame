@@ -32,12 +32,14 @@ public class Unpuzzle
         printBanner();
 
         String playerName = "";
-        while (playerName.isEmpty()) {
+        while (playerName.isEmpty())
+        {
             System.out.print("Zadajte svoje meno: ");
             System.out.flush();
             playerName = scanner.nextLine().trim();
 
-            if (playerName.equalsIgnoreCase("wipe")) {
+            if (playerName.equalsIgnoreCase("wipe"))
+            {
                 wipeAllData(scoreService, commentService, ratingService);
                 playerName = "";
                 continue;
@@ -87,21 +89,6 @@ public class Unpuzzle
         }
     }
 
-
-    private static void printBanner()
-    {
-        System.out.println("╔══════════════════════════════════════╗");
-        System.out.println("║                                      ║");
-        System.out.println("║          U N P U Z Z L E             ║");
-        System.out.println("║                                      ║");
-        System.out.println("║  Odstranujte bloky v spravnom        ║");
-        System.out.println("║  poradi. Kazdy blok sa pohybuje      ║");
-        System.out.println("║  v smere svojej sipky.               ║");
-        System.out.println("║                                      ║");
-        System.out.println("╚══════════════════════════════════════╝");
-        System.out.println();
-    }
-
     private static int selectLevel(Scanner scanner)
     {
         System.out.println("Vyberte uroven:");
@@ -140,5 +127,20 @@ public class Unpuzzle
         System.out.print("Chcete hrat znova? (a = ano, inak ukoncit): ");
         String input = scanner.next().trim().toLowerCase();
         return input.equals("a");
+    }
+
+
+    private static void printBanner()
+    {
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║                                      ║");
+        System.out.println("║          U N P U Z Z L E             ║");
+        System.out.println("║                                      ║");
+        System.out.println("║  Odstranujte bloky v spravnom        ║");
+        System.out.println("║  poradi. Kazdy blok sa pohybuje      ║");
+        System.out.println("║  v smere svojej sipky.               ║");
+        System.out.println("║                                      ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.println();
     }
 }
