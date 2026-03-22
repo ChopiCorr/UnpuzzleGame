@@ -10,8 +10,6 @@ public class Rating
     private int rating;
     private Timestamp ratedOn;
 
-    public Rating() {}
-
     public Rating(String player, String game, int rating, Timestamp ratedOn)
     {
         if (rating < 1 || rating > 5)
@@ -44,24 +42,9 @@ public class Rating
         return ratedOn;
     }
 
-    public void setPlayer(String player)
-    {
-        this.player = player;
-    }
-
     public void setGame(String game)
     {
         this.game = game;
-    }
-
-    public void setRating(int rating)
-    {
-        this.rating = rating;
-    }
-
-    public void setRatedOn(Timestamp ratedOn)
-    {
-        this.ratedOn = ratedOn;
     }
 
     @Override

@@ -9,9 +9,8 @@ public class Comment
     private String comment;
     private Timestamp commentedOn;
 
-    public Comment() {}
-
-    public Comment(String player, String game, String comment, Timestamp commentedOn) {
+    public Comment(String player, String game, String comment, Timestamp commentedOn)
+    {
         this.player = player;
         this.game = game;
         this.comment = comment;
@@ -35,22 +34,9 @@ public class Comment
         return commentedOn;
     }
 
-    public void setPlayer(String player)
-    {
-        this.player = player;
-    }
     public void setGame(String game)
     {
         this.game = game;
-    }
-    public void setComment(String comment)
-    {
-        this.comment = comment;
-    }
-
-    public void setCommentedOn(Timestamp commentedOn)
-    {
-        this.commentedOn = commentedOn;
     }
 
     @Override

@@ -1,7 +1,5 @@
 package sk.tuke.gamestudio.game.Unpuzzle.Core;
 
-//import java.util.Random;
-
 import java.util.List;
 import java.util.ArrayList;
 
@@ -11,7 +9,6 @@ public class Field
     private final int cols;
     private final Piece[][] grid;
     private final List<Piece> pieces;
-        //private final String levelName;
     private GameState gameState;
 
 
@@ -21,7 +18,6 @@ public class Field
         this.cols = level.getCols();
         this.grid = new Piece[rows][cols];
         this.pieces = new ArrayList<>();
-        //this.levelName = "Level " + level.getNumber() + ":" + level.getName();
         this.gameState = GameState.PLAYING;
         loadlevel(level);
     }

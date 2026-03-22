@@ -31,11 +31,6 @@ public class Unpuzzle
         }
         printBanner();
 
-
-
-        //System.out.print("Zadajte svoje meno: ");
-        //String playerName = scanner.nextLine().trim();
-
         String playerName = "";
         while (playerName.isEmpty()) {
             System.out.print("Zadajte svoje meno: ");

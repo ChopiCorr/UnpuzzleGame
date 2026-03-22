@@ -53,7 +53,7 @@ public class ConsoleUI
             printLiveScore(totalPoints, moveCount);
             long moveStart = System.currentTimeMillis();
 
-            String input = getUserInput(/*playerName*/);
+            String input = getUserInput();
 
             if (input.equalsIgnoreCase("comment"))
             {

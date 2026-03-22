@@ -4,7 +4,8 @@ import sk.tuke.gamestudio.entity.Rating;
 
 import java.sql.*;
 
-public class RatingServiceJDBC implements RatingService {
+public class RatingServiceJDBC implements RatingService
+{
     public static final String URL = "jdbc:postgresql://localhost:5432/gamestudio";
     public static final String USER = "postgres";
     public static final String PASSWORD = "1234";
@@ -15,16 +16,19 @@ public class RatingServiceJDBC implements RatingService {
     public static final String UPSERT = "INSERT INTO rating (player, game, rating, ratedon) VALUES (?, ?, ?, ?) ON CONFLICT (player, game) DO UPDATE SET rating = EXCLUDED.rating, ratedon = EXCLUDED.ratedon";
 
     @Override
-    public void setRating(Rating rating) {
+    public void setRating(Rating rating)
+    {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement statement = connection.prepareStatement(UPSERT)
-        ) {
+        )
+        {
             statement.setString(1, rating.getPlayer());
             statement.setString(2, rating.getGame());
             statement.setInt(3, rating.getRating());
             statement.setTimestamp(4, new Timestamp(rating.getRatedOn().getTime()));
             statement.executeUpdate();
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             throw new RatingException("Problem inserting/updating rating", e);
         }
     }
@@ -48,30 +52,40 @@ public class RatingServiceJDBC implements RatingService {
     }
 
     @Override
-    public int getRating(String game, String player) {
+    public int getRating(String game, String player)
+    {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement statement = connection.prepareStatement(SELECT_PLAYER)
-        ) {
+        )
+        {
             statement.setString(1, game);
             statement.setString(2, player);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
+            try (ResultSet rs = statement.executeQuery())
+            {
+                if (rs.next())
+                {
                     return rs.getInt(1);
                 }
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             throw new RatingException("Problem selecting player rating", e);
         }
         return 0;
     }
 
     @Override
-    public void reset() {
+    public void reset()
+    {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement statement = connection.createStatement()
-        ) {
+        )
+        {
             statement.executeUpdate(DELETE);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             throw new RatingException("Problem deleting ratings", e);
         }
     }

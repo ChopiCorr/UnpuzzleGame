@@ -1,8 +1,9 @@
-package sk.tuke.gamestudio.game.Unpuzzle.consoleUI;
+package sk.tuke.gamestudio.game.Unpuzzle.ConsoleUI;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sk.tuke.gamestudio.game.Unpuzzle.consoleUI.Unpuzzle;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
