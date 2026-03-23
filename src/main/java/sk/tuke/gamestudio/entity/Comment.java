@@ -2,13 +2,15 @@ package sk.tuke.gamestudio.entity;
 
 import java.sql.Timestamp;
 
-public class Comment {
+public class Comment
+{
     private String player;
     private String game;
     private String comment;
     private Timestamp commentedOn;
 
-    public Comment(String player, String game, String comment, Timestamp commentedOn) {
+    public Comment(String player, String game, String comment, Timestamp commentedOn)
+    {
         this.player = player;
         this.game = game;
         this.comment = comment;

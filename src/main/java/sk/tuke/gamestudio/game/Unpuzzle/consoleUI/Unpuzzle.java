@@ -56,6 +56,7 @@ public class Unpuzzle
         Level level = LevelPresets.getLevel(choice);
         Field field = new Field(level);
 
+        //
         ConsoleUI ui = new ConsoleUI(field, scanner, scoreService, commentService, ratingService);
         ui.run(playerName);
 

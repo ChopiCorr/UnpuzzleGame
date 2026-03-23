@@ -5,11 +5,8 @@ import java.util.Date;
 public class Score
 {
     private String game;
-
     private String player;
-
     private int points;
-
     private Date playedOn;
 
     public Score(String game, String player, int points, Date playedOn)
