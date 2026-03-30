@@ -21,7 +21,7 @@ public class Field
         this.gameState = GameState.PLAYING;
         loadlevel(level);
     }
-
+//nacita
     private void loadlevel(Level level)
     {
         int id = 1;

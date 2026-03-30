@@ -1,14 +1,23 @@
 package sk.tuke.gamestudio.entity;
 
 import java.sql.Timestamp;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
+@Entity
 public class Rating
 {
+    @Id
+    @GeneratedValue
+    private int ident;
 
     private String player;
     private String game;
     private int rating;
     private Timestamp ratedOn;
+
+    public Rating() {}
 
     public Rating(String player, String game, int rating, Timestamp ratedOn)
     {
@@ -20,6 +29,14 @@ public class Rating
         this.game = game;
         this.rating = rating;
         this.ratedOn = ratedOn;
+    }
+
+    public int getIdent() {
+        return ident;
+    }
+
+    public void setIdent(int ident) {
+        this.ident = ident;
     }
 
     public String getPlayer()
