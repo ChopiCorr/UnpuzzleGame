@@ -5,7 +5,25 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import javax.persistence.NamedQuery;
+import javax.persistence.NamedQueries;
+
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "Rating.getAverageRating",
+                query = "SELECT AVG(r.rating) FROM Rating r WHERE r.game=:game"
+        ),
+        @NamedQuery(
+                name = "Rating.getRating",
+                query = "SELECT r FROM Rating r WHERE r.game=:game AND r.player=:player"
+        ),
+        @NamedQuery(
+                name = "Rating.resetRatings",
+                query = "DELETE FROM Rating"
+        )
+})
+
 public class Rating
 {
     @Id
@@ -57,6 +75,10 @@ public class Rating
     public Timestamp getRatedOn()
     {
         return ratedOn;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     public void setGame(String game)

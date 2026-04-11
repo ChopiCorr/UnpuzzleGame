@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class Unpuzzle
 {
-    public static void main(String[] args)
+    /* public static void main(String[] args)
     {
         Scanner scanner = new Scanner(System.in);
 
@@ -71,7 +71,7 @@ public class Unpuzzle
         System.out.println();
         System.out.println("Dakujeme za hru! Zbohom.");
         scanner.close();
-    }
+    }*/
 
     private static void wipeAllData(ScoreService scoreService,
                                     CommentService commentService,

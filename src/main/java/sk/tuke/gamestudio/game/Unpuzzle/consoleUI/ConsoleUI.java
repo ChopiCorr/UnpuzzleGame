@@ -1,9 +1,12 @@
 package sk.tuke.gamestudio.game.Unpuzzle.consoleUI;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import sk.tuke.gamestudio.entity.Comment;
 import sk.tuke.gamestudio.entity.Score;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.Field;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.GameState;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.Level;
+import sk.tuke.gamestudio.game.Unpuzzle.Core.LevelPresets;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.Piece;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.PieceState;
 import sk.tuke.gamestudio.service.CommentService;
@@ -18,25 +21,65 @@ public class ConsoleUI
 {
     public static final String GAME_NAME = "unpuzzle";
 
-    private final Field field;
+    private Field field;
     private final Scanner scanner;
-    private final ServiceHandler session;
 
-    private final ScoreService scoreService;
-    private final CommentService commentService;
-    private final RatingService ratingService;
+    @Autowired
+    private ScoreService scoreService;
 
-    public ConsoleUI(Field field, Scanner scanner,
-                     ScoreService scoreService,
-                     CommentService commentService,
-                     RatingService ratingService)
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private RatingService ratingService;
+
+    private ServiceHandler session;
+
+    public ConsoleUI(Scanner scanner)
     {
-        this.field = field;
         this.scanner = scanner;
-        this.scoreService = scoreService;
-        this.commentService = commentService;
-        this.ratingService = ratingService;
-        this.session = new ServiceHandler(scanner, scoreService, commentService, ratingService);
+    }
+
+    public void play()
+    {
+        session = new ServiceHandler(scanner, scoreService, commentService, ratingService);
+
+        printBanner();
+
+        String playerName = "";
+        while (playerName.isEmpty())
+        {
+            System.out.print("Zadajte svoje meno: ");
+            System.out.flush();
+            playerName = scanner.nextLine().trim();
+
+            if (playerName.equalsIgnoreCase("wipe"))
+            {
+                wipeAllData();
+                playerName = "";
+                continue;
+            }
+
+            if (playerName.isEmpty()) playerName = "Anonymous";
+            if (playerName.length() > 64) playerName = playerName.substring(0, 64);
+        }
+        System.out.println();
+
+        int choice = selectLevel();
+        field = new Field(LevelPresets.getLevel(choice));
+
+        run(playerName);
+
+        while (playAgain())
+        {
+            choice = selectLevel();
+            field = new Field(LevelPresets.getLevel(choice));
+            run(playerName);
+        }
+
+        System.out.println();
+        System.out.println("Dakujeme za hru! Zbohom.");
+        scanner.close();
     }
 
     public void run(String playerName)
@@ -94,6 +137,73 @@ public class ConsoleUI
         showAverageRating();
     }
 
+    private void wipeAllData()
+    {
+        try
+        {
+            if (scoreService   != null) scoreService.reset();
+            if (commentService != null) commentService.reset();
+            if (ratingService  != null) ratingService.reset();
+            System.out.println("  [WIPE] Vsetky data boli vymazane.");
+        }
+        catch (Exception e)
+        {
+            System.out.println("  [WIPE] Chyba pri mazani dat: " + e.getMessage());
+        }
+    }
+
+    private int selectLevel()
+    {
+        System.out.println("Vyberte uroven:");
+        for (int i = 1; i <= LevelPresets.LEVEL_COUNT; i++)
+        {
+            Level level = LevelPresets.getLevel(i);
+            System.out.println("  " + i + ".  " + level.getName());
+        }
+        System.out.println();
+
+        int choice = 0;
+        while (choice < 1 || choice > LevelPresets.LEVEL_COUNT)
+        {
+            System.out.print("Vasa volba (1-" + LevelPresets.LEVEL_COUNT + "): ");
+            if (scanner.hasNextInt())
+            {
+                choice = scanner.nextInt();
+                scanner.nextLine();
+                if (choice < 1 || choice > LevelPresets.LEVEL_COUNT)
+                    System.out.println("  Neplatna volba. Zadajte cislo od 1 do " + LevelPresets.LEVEL_COUNT + ".");
+            }
+            else
+            {
+                System.out.println("  Neplatny vstup. Zadajte cislo.");
+                scanner.nextLine();
+            }
+        }
+        return choice;
+    }
+
+    private boolean playAgain()
+    {
+        System.out.println();
+        System.out.print("Chcete hrat znova? (a = ano, inak ukoncit): ");
+        String input = scanner.next().trim().toLowerCase();
+        return input.equals("a");
+    }
+
+    private void printBanner()
+    {
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║                                      ║");
+        System.out.println("║          U N P U Z Z L E             ║");
+        System.out.println("║                                      ║");
+        System.out.println("║  Odstranujte bloky v spravnom        ║");
+        System.out.println("║  poradi. Kazdy blok sa pohybuje      ║");
+        System.out.println("║  v smere svojej sipky.               ║");
+        System.out.println("║                                      ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.println();
+    }
+
     public void printField()
     {
         System.out.println("  +" + "------".repeat(field.getCols()) + "+");
@@ -104,13 +214,9 @@ public class ConsoleUI
             {
                 Piece piece = field.getPieceAt(row, col);
                 if (piece == null)
-                {
                     System.out.print("[    ]");
-                }
                 else
-                {
                     System.out.printf("[%2d%s ]", piece.getId(), piece.getDirection().getSymbol());
-                }
             }
             System.out.println("|");
         }
@@ -152,9 +258,7 @@ public class ConsoleUI
             System.out.println("  ╠════╬════════════════════╬════════╬═════════════════════╣");
 
             if (top.isEmpty())
-            {
                 System.out.println("  ║         Zatial ziadne skore.                         ║");
-            }
             else
             {
                 int rank = 1;
@@ -188,9 +292,7 @@ public class ConsoleUI
             System.out.println("  ╠════════════════════╬══════════════════════════════════════════╬═════════════════════╣");
 
             if (comments.isEmpty())
-            {
                 System.out.println("  ║                        Zatial ziadne komentare.                                 ║");
-            }
             else
             {
                 for (Comment c : comments)
@@ -234,9 +336,7 @@ public class ConsoleUI
             for (Piece piece : field.getPieces())
             {
                 if (piece.getState() == PieceState.ON_BOARD)
-                {
                     System.out.print(piece.getId() + piece.getDirection().getSymbol() + " ");
-                }
             }
             System.out.println();
             System.out.print("  ID bloku / [comment] / [rating]: ");
@@ -245,9 +345,7 @@ public class ConsoleUI
             String input = scanner.nextLine().trim();
 
             if (input.equalsIgnoreCase("comment") || input.equalsIgnoreCase("rating"))
-            {
                 return input;
-            }
 
             if (input.isEmpty())
             {
