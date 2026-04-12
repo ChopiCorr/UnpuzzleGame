@@ -34,7 +34,7 @@ public class ConsoleUITest
     private ConsoleUI createUI(Field field, String simulatedInput)
     {
         Scanner scanner = new Scanner(new ByteArrayInputStream(simulatedInput.getBytes()));
-        return new ConsoleUI(field, scanner, null, null, null);
+        return new ConsoleUI(field, scanner);
     }
 
     @Test

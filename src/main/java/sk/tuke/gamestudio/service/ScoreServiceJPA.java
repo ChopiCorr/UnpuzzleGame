@@ -8,7 +8,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Transactional
-public class    ScoreServiceJPA implements ScoreService
+public class ScoreServiceJPA implements ScoreService
 {
     @PersistenceContext
     private EntityManager entityManager;

@@ -40,6 +40,12 @@ public class ConsoleUI
         this.scanner = scanner;
     }
 
+    public ConsoleUI(Field field, Scanner scanner)
+    {
+        this.field = field;
+        this.scanner = scanner;
+    }
+
     public void play()
     {
         session = new ServiceHandler(scanner, scoreService, commentService, ratingService);
