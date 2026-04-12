@@ -2,32 +2,45 @@ package sk.tuke.gamestudio.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import sk.tuke.gamestudio.entity.Comment;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DataJpaTest
+@Import(CommentServiceJPA.class)
+@Transactional
+@ContextConfiguration(classes = TestJpaConfig.class)
 public class CommentServiceTest
 {
+    @Autowired
+    private CommentServiceJPA service;
 
-    private CommentService service;
+    @Autowired
+    private TestEntityManager em;
 
     @BeforeEach
     public void setUp()
     {
-        service = new CommentServiceJDBC();
         service.reset();
+        em.flush();
     }
 
     @Test
     public void testAddCommentAndRetrieve()
     {
-        Comment comment = new Comment("PlayerA", "unpuzzle", "Skvelá hra!",
-                Timestamp.valueOf(LocalDateTime.now()));
-        service.addComment(comment);
+        service.addComment(new Comment("PlayerA", "unpuzzle", "Skvelá hra!",
+                Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
 
         List<Comment> comments = service.getComments("unpuzzle");
         assertFalse(comments.isEmpty(), "Zoznam komentárov by nemal byť prázdny.");
@@ -40,9 +53,11 @@ public class CommentServiceTest
     {
         service.addComment(new Comment("PlayerA", "unpuzzle", "Prvý",
                 Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
         Thread.sleep(50);
         service.addComment(new Comment("PlayerB", "unpuzzle", "Druhý",
                 Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
 
         List<Comment> comments = service.getComments("unpuzzle");
         assertEquals(2, comments.size());
@@ -58,8 +73,11 @@ public class CommentServiceTest
             service.addComment(new Comment("Player" + i, "unpuzzle", "Komentár " + i,
                     Timestamp.valueOf(LocalDateTime.now())));
         }
+        em.flush();
+
         List<Comment> comments = service.getComments("unpuzzle");
-        assertTrue(comments.size() <= 10, "Výsledok by mal byť obmedzený na 10 komentárov.");
+        assertTrue(comments.size() <= 10,
+                "Výsledok by mal byť obmedzený na 10 komentárov.");
     }
 
     @Test
@@ -69,9 +87,11 @@ public class CommentServiceTest
                 Timestamp.valueOf(LocalDateTime.now())));
         service.addComment(new Comment("PlayerB", "othergame", "Pre inú hru",
                 Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
 
         List<Comment> comments = service.getComments("unpuzzle");
-        assertEquals(1, comments.size(), "Musia byť vrátené iba komentáre pre hru 'unpuzzle'.");
+        assertEquals(1, comments.size(),
+                "Musia byť vrátené iba komentáre pre hru 'unpuzzle'.");
     }
 
     @Test
@@ -79,7 +99,10 @@ public class CommentServiceTest
     {
         service.addComment(new Comment("PlayerA", "unpuzzle", "Test",
                 Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
         service.reset();
+        em.flush();
+
         List<Comment> comments = service.getComments("unpuzzle");
         assertTrue(comments.isEmpty(), "Po reset() musí byť tabuľka prázdna.");
     }
@@ -92,4 +115,3 @@ public class CommentServiceTest
         assertTrue(comments.isEmpty());
     }
 }
-

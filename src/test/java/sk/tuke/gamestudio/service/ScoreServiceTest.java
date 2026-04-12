@@ -2,31 +2,45 @@ package sk.tuke.gamestudio.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import sk.tuke.gamestudio.entity.Score;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ScoreServiceTest {
+@DataJpaTest
+@Import(ScoreServiceJPA.class)
+@Transactional
+@ContextConfiguration(classes = TestJpaConfig.class)
+public class ScoreServiceTest
+{
+    @Autowired
+    private ScoreServiceJPA service;
 
-    private ScoreService service;
+    @Autowired
+    private TestEntityManager em;
 
     @BeforeEach
     public void setUp()
     {
-        service = new ScoreServiceJDBC();
         service.reset();
+        em.flush();
     }
 
     @Test
     public void testAddScoreAndRetrieve()
     {
-        Score score = new Score("unpuzzle", "TestPlayer", 300,
-                Timestamp.valueOf(LocalDateTime.now()));
-        service.addScore(score);
+        service.addScore(new Score("unpuzzle", "TestPlayer", 300,
+                Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
 
         List<Score> top = service.getTopScores("unpuzzle");
         assertFalse(top.isEmpty(), "Zoznam skóre by nemal byť prázdny po pridaní záznamu.");
@@ -37,9 +51,13 @@ public class ScoreServiceTest {
     @Test
     public void testTopScoresOrderedByPointsDesc()
     {
-        service.addScore(new Score("unpuzzle", "PlayerA", 100, Timestamp.valueOf(LocalDateTime.now())));
-        service.addScore(new Score("unpuzzle", "PlayerB", 500, Timestamp.valueOf(LocalDateTime.now())));
-        service.addScore(new Score("unpuzzle", "PlayerC", 300, Timestamp.valueOf(LocalDateTime.now())));
+        service.addScore(new Score("unpuzzle", "PlayerA", 100,
+                Timestamp.valueOf(LocalDateTime.now())));
+        service.addScore(new Score("unpuzzle", "PlayerB", 500,
+                Timestamp.valueOf(LocalDateTime.now())));
+        service.addScore(new Score("unpuzzle", "PlayerC", 300,
+                Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
 
         List<Score> top = service.getTopScores("unpuzzle");
         assertEquals(3, top.size());
@@ -57,6 +75,8 @@ public class ScoreServiceTest {
             service.addScore(new Score("unpuzzle", "Player" + i, i * 10,
                     Timestamp.valueOf(LocalDateTime.now())));
         }
+        em.flush();
+
         List<Score> top = service.getTopScores("unpuzzle");
         assertTrue(top.size() <= 10, "Výsledok by mal byť obmedzený na 10 záznamov.");
     }
@@ -64,8 +84,11 @@ public class ScoreServiceTest {
     @Test
     public void testTopScoresFilteredByGame()
     {
-        service.addScore(new Score("unpuzzle", "PlayerA", 200, Timestamp.valueOf(LocalDateTime.now())));
-        service.addScore(new Score("othergame", "PlayerB", 999, Timestamp.valueOf(LocalDateTime.now())));
+        service.addScore(new Score("unpuzzle", "PlayerA", 200,
+                Timestamp.valueOf(LocalDateTime.now())));
+        service.addScore(new Score("othergame", "PlayerB", 999,
+                Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
 
         List<Score> top = service.getTopScores("unpuzzle");
         assertEquals(1, top.size(), "Musia byť vrátené iba skóre pre hru 'unpuzzle'.");
@@ -75,8 +98,12 @@ public class ScoreServiceTest {
     @Test
     public void testReset()
     {
-        service.addScore(new Score("unpuzzle", "PlayerA", 100, Timestamp.valueOf(LocalDateTime.now())));
+        service.addScore(new Score("unpuzzle", "PlayerA", 100,
+                Timestamp.valueOf(LocalDateTime.now())));
+        em.flush();
         service.reset();
+        em.flush();
+
         List<Score> top = service.getTopScores("unpuzzle");
         assertTrue(top.isEmpty(), "Po reset() musí byť tabuľka prázdna.");
     }

@@ -1,0 +1,41 @@
+### add score
+POST http://localhost:8080/api/score
+Content-Type: application/json
+
+{
+  "game": "unpuzzle",
+  "player": "TestPlayer",
+  "points": 300,
+  "playedOn": "2026-04-13T00:00:00.000Z"
+}
+
+### get top scores
+GET http://localhost:8080/api/score/unpuzzle
+
+### add comm
+POST http://localhost:8080/api/comment
+Content-Type: application/json
+
+{
+  "game": "unpuzzle",
+  "player": "TestPlayer",
+  "comment": "Skvelá hra!",
+  "commentedOn": "2026-04-13T00:00:00.000Z"
+}
+
+### get comm
+GET http://localhost:8080/api/comment/unpuzzle
+
+### add rating
+POST http://localhost:8080/api/rating
+Content-Type: application/json
+
+{
+  "game": "unpuzzle",
+  "player": "TestPlayer",
+  "rating": 5,
+  "ratedOn": "2026-04-13T00:00:00.000Z"
+}
+
+### get rating
+GET http://localhost:8080/api/rating/unpuzzle

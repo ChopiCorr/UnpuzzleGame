@@ -96,3 +96,13 @@ UnpuzzleTest 	Spustenie main bez výnimky, zobrazenie bannera, menu levelov, vý
 •	Tabuľkový výpis — TOP 10 skóre aj komentáre sú zobrazené v zarovnaných tabuľkách s rámčekom.
 •	Príkazy počas hry — 'comment' a 'rating' sú dostupné kedykoľvek, nielen po skončení partii.
 
+
+Perzistencia dát cez JPA — databázová vrstva bola prebudovaná z priamych JDBC volaní na JPA
+implementáciu pomocou Hibernate a Spring Data. Entity (Score, Comment, Rating) sú mapované
+na databázové tabuľky pomocou anotácií, čo eliminuje ručné písanie SQL dotazov.
+
+Rozdelenie aplikácie na klient-server architektúru cez REST API — aplikácia je rozdelená na dve samostatne spustiteľné časti.
+Server (GameStudioServer) beží na porte 8080, prijíma HTTP požiadavky a pristupuje k databáze výhradne cez JPA služby.
+Klient (SpringClient) spúšťa konzolové rozhranie hry a komunikuje so serverom pomocou RestTemplate —
+volania ScoreService, CommentService a RatingService sú transparentne preložené na HTTP požiadavky bez akejkoľvek zmeny hernej logiky.
+
