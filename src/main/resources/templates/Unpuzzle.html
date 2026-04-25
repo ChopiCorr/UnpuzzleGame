@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Unpuzzle</title>
+    <link rel="stylesheet" th:href="@{/css/unpuzzle.css}"/>
+</head>
+<body>
+
+<div class="container">
+    <h1>UNPUZZLE</h1>
+
+    <!-- форма имени игрока -->
+    <div class="player-form">
+        <form th:action="@{/unpuzzle}" method="get">
+            <input type="hidden" name="action" value="new"/>
+            <input type="text" name="player" th:value="${playerName}" placeholder="Vase meno"/>
+            <select name="level">
+                <option th:each="i : ${#numbers.sequence(1, levelCount)}"
+                        th:value="${i}"
+                        th:text="'Uroven ' + ${i}"/>
+            </select>
+            <button type="submit">Nova hra</button>
+        </form>
+    </div>
+
+    <!-- игровое поле -->
+    <div class="game-area" th:if="${field != null}">
+        <div class="stats">
+            <span>Hrac: <strong th:text="${playerName}"/></span>
+            <span>Skore: <strong th:text="${totalPoints}"/></span>
+            <span>Tahy: <strong th:text="${moveCount}"/></span>
+        </div>
+
+        <div th:utext="${@unpuzzleController.getHtmlField()}"/>
+
+        <div class="message" th:if="${!#strings.isEmpty(message)}"
+             th:text="${message}"
+             th:classappend="${solved} ? 'solved' : ''"/>
+    </div>
+
+    <!-- таблица скоров -->
+    <div class="scores" th:if="${topScores != null and !topScores.isEmpty()}">
+        <h2>Top skore</h2>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Hrac</th>
+                <th>Body</th>
+                <th>Datum</th>
+            </tr>
+            <tr th:each="score, i : ${topScores}">
+                <td th:text="${i.count}"/>
+                <td th:text="${score.player}"/>
+                <td th:text="${score.points}"/>
+                <td th:text="${#dates.format(score.playedOn, 'yyyy-MM-dd HH:mm')}"/>
+            </tr>
+        </table>
+    </div>
+
+    <!-- рейтинг -->
+    <div class="rating">
+        <h2>Hodnotenie</h2>
+        <p>Priemerne hodnotenie: <strong th:text="${avgRating}"/>/5</p>
+        <form th:action="@{/unpuzzle}" method="get">
+            <input type="hidden" name="action" value="rating"/>
+            <select name="rating">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <button type="submit">Ohodnotit</button>
+        </form>
+    </div>
+
+    <!-- комментарии -->
+    <div class="comments">
+        <h2>Komentare</h2>
+        <form th:action="@{/unpuzzle}" method="get">
+            <input type="hidden" name="action" value="comment"/>
+            <input type="text" name="comment" placeholder="Vas komentar..."/>
+            <button type="submit">Pridat</button>
+        </form>
+        <table th:if="${comments != null and !comments.isEmpty()}">
+            <tr>
+                <th>Hrac</th>
+                <th>Komentar</th>
+                <th>Datum</th>
+            </tr>
+            <tr th:each="c : ${comments}">
+                <td th:text="${c.player}"/>
+                <td th:text="${c.comment}"/>
+                <td th:text="${#dates.format(c.commentedOn, 'yyyy-MM-dd HH:mm')}"/>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
