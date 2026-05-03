@@ -30,6 +30,7 @@
             <span>Hrac: <strong th:text="${playerName}"/></span>
             <span>Skore: <strong th:text="${totalPoints}"/></span>
             <span>Tahy: <strong th:text="${moveCount}"/></span>
+            <span>Zostatok: <strong th:text="${remaining}"/></span>
         </div>
 
         <div th:utext="${@unpuzzleController.getHtmlField()}"/>

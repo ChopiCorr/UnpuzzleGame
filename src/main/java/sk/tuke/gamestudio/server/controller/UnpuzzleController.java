@@ -37,6 +37,7 @@ public class UnpuzzleController
     private int moveCount = 0;
     private boolean scoreSaved = false;
     private String message = "";
+    private long lastMoveTime = 0;
 
     @RequestMapping("/unpuzzle")
     public String unpuzzle(
@@ -64,6 +65,7 @@ public class UnpuzzleController
                     moveCount = 0;
                     scoreSaved = false;
                     message = "";
+                    lastMoveTime = System.currentTimeMillis();
                     break;
 
                 case "remove":
@@ -74,7 +76,9 @@ public class UnpuzzleController
                         boolean success = field.removePiece(id);
                         if (success)
                         {
-                            long seconds = (System.currentTimeMillis() - start) / 1000;
+                            long seconds = (System.currentTimeMillis() - lastMoveTime) / 1000;
+                            lastMoveTime = System.currentTimeMillis();
+                            //long seconds = (System.currentTimeMillis() - start) / 1000;
                             totalPoints += calcPoints(seconds);
                             moveCount++;
                             message = "Blok " + id + " odstraneny.";
@@ -135,6 +139,11 @@ public class UnpuzzleController
         model.addAttribute("message", message);
         model.addAttribute("solved", field != null && field.getGameState() == GameState.SOLVED);
         model.addAttribute("levelCount", LevelPresets.LEVEL_COUNT);
+        model.addAttribute("remaining",
+                field != null ? field.getPieces().stream()
+                        .filter(p -> p.getState() == sk.tuke.gamestudio.game.Unpuzzle.Core.PieceState.ON_BOARD)
+                        .count() : 0);
+
 
         try { model.addAttribute("topScores", scoreService.getTopScores(GAME_NAME)); }
         catch (Exception e) { model.addAttribute("topScores", List.of()); }
