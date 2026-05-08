@@ -10,11 +10,60 @@
 <div class="container">
     <h1>UNPUZZLE</h1>
 
-    <!-- форма имени игрока -->
-    <div class="player-form">
+    <!-- сообщение -->
+    <div class="message" th:if="${!#strings.isEmpty(message)}"
+         th:text="${message}"
+         th:classappend="${solved} ? 'solved' : ''"/>
+
+    <!-- авторизация — показывается если НЕ залогинен -->
+    <div class="auth-section" th:if="${!loggedIn}">
+        <!-- форма входа -->
+        <div id="loginForm">
+            <h2>Prihlasenie</h2>
+            <form th:action="@{/unpuzzle}" method="get">
+                <input type="hidden" name="authAction" value="login"/>
+                <input type="text" name="username" placeholder="Meno" required/>
+                <input type="password" name="password" placeholder="Heslo" required/>
+                <button type="submit">Prihlasit sa</button>
+            </form>
+            <p class="switch-link" onclick="switchForm()">Registracia</p>
+        </div>
+
+        <!-- форма регистрации -->
+        <div id="registerForm" style="display:none;">
+            <h2>Registracia</h2>
+            <form th:action="@{/unpuzzle}" method="get">
+                <input type="hidden" name="authAction" value="register"/>
+                <input type="text" name="username" placeholder="Meno" required/>
+                <input type="password" name="password" placeholder="Heslo" required/>
+                <button type="submit">Registrovat sa</button>
+            </form>
+            <p class="switch-link" onclick="switchForm()">Prihlasenie</p>
+        </div>
+    </div>
+
+    <script>
+        function switchForm() {
+            var login = document.getElementById('loginForm');
+            var register = document.getElementById('registerForm');
+            if (login.style.display === 'none') {
+                login.style.display = 'block';
+                register.style.display = 'none';
+            } else {
+                login.style.display = 'none';
+                register.style.display = 'block';
+            }
+        }
+    </script>
+
+    <!-- панель игрока — показывается если залогинен -->
+    <div class="player-form" th:if="${loggedIn}">
+        <div class="player-header">
+            <span>Hrac: <strong th:text="${playerName}"/></span>
+            <a class="logout-btn" th:href="@{/unpuzzle(authAction='logout')}">Odhlasit sa</a>
+        </div>
         <form th:action="@{/unpuzzle}" method="get">
             <input type="hidden" name="action" value="new"/>
-            <input type="text" name="player" th:value="${playerName}" placeholder="Vase meno"/>
             <select name="level">
                 <option th:each="i : ${#numbers.sequence(1, levelCount)}"
                         th:value="${i}"
@@ -24,20 +73,14 @@
         </form>
     </div>
 
-    <!-- игровое поле -->
-    <div class="game-area" th:if="${field != null}">
+    <!-- игровое поле — только если залогинен и игра начата -->
+    <div class="game-area" th:if="${loggedIn and field != null}">
         <div class="stats">
-            <span>Hrac: <strong th:text="${playerName}"/></span>
             <span>Skore: <strong th:text="${totalPoints}"/></span>
             <span>Tahy: <strong th:text="${moveCount}"/></span>
             <span>Zostatok: <strong th:text="${remaining}"/></span>
         </div>
-
         <div th:utext="${@unpuzzleController.getHtmlField()}"/>
-
-        <div class="message" th:if="${!#strings.isEmpty(message)}"
-             th:text="${message}"
-             th:classappend="${solved} ? 'solved' : ''"/>
     </div>
 
     <!-- таблица скоров -->
@@ -63,7 +106,7 @@
     <div class="rating">
         <h2>Hodnotenie</h2>
         <p>Priemerne hodnotenie: <strong th:text="${avgRating}"/>/5</p>
-        <form th:action="@{/unpuzzle}" method="get">
+        <form th:if="${loggedIn}" th:action="@{/unpuzzle}" method="get">
             <input type="hidden" name="action" value="rating"/>
             <select name="rating">
                 <option value="1">1</option>
@@ -74,16 +117,18 @@
             </select>
             <button type="submit">Ohodnotit</button>
         </form>
+        <p th:unless="${loggedIn}" style="color: #aaa;">Pre hodnotenie sa prihlaste.</p>
     </div>
 
     <!-- комментарии -->
     <div class="comments">
         <h2>Komentare</h2>
-        <form th:action="@{/unpuzzle}" method="get">
+        <form th:if="${loggedIn}" th:action="@{/unpuzzle}" method="get">
             <input type="hidden" name="action" value="comment"/>
             <input type="text" name="comment" placeholder="Vas komentar..."/>
             <button type="submit">Pridat</button>
         </form>
+        <p th:unless="${loggedIn}" style="color: #aaa;">Pre pridanie komentara sa prihlaste.</p>
         <table th:if="${comments != null and !comments.isEmpty()}">
             <tr>
                 <th>Hrac</th>

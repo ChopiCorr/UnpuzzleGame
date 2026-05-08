@@ -46,7 +46,7 @@ h2 {
     flex-wrap: wrap;
 }
 
-input[type="text"], select {
+input[type="text"], input[type="password"], select {
     padding: 8px 12px;
     border: 1px solid #e94560;
     border-radius: 4px;
@@ -208,4 +208,58 @@ tr:hover td {
     gap: 10px;
     align-items: center;
     margin-bottom: 10px;
+}
+
+/* Авторизация */
+.auth-section {
+    background: #16213e;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.auth-form h2 {
+    margin-bottom: 15px;
+}
+
+.auth-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Хедер игрока */
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.logout-btn {
+    padding: 6px 14px;
+    background: transparent;
+    color: #e94560;
+    border: 1px solid #e94560;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.logout-btn:hover {
+    background: #e94560;
+    color: white;
+}
+
+.switch-link {
+    margin-top: 12px;
+    color: #aaa;
+    font-size: 0.85em;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.switch-link:hover {
+    color: #e94560;
 }
