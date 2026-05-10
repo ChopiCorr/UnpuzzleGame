@@ -32,7 +32,7 @@ public class UnpuzzleController
     private RatingService ratingService;
 
     @Autowired
-    private UserService userService;
+    private PlayerService playerservice;
 
     private Field field;
     private String playerName = "Anonymous";
@@ -60,7 +60,7 @@ public class UnpuzzleController
             switch (authAction)
             {
                 case "login":
-                    if (userService.login(username, password))
+                    if (playerservice.login(username, password))
                     {
                         playerName = username.trim();
                         loggedIn = true;
@@ -73,7 +73,7 @@ public class UnpuzzleController
                     break;
 
                 case "register":
-                    if (userService.register(username, password))
+                    if (playerservice.register(username, password))
                     {
                         playerName = username.trim();
                         loggedIn = true;
