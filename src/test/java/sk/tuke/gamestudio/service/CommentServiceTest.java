@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import sk.tuke.gamestudio.entity.Comment;
+import sk.tuke.gamestudio.service.Comment.CommentServiceJPA;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;

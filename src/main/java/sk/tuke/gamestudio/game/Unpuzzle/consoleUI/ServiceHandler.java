@@ -3,9 +3,9 @@ package sk.tuke.gamestudio.game.Unpuzzle.consoleUI;
 import sk.tuke.gamestudio.entity.Comment;
 import sk.tuke.gamestudio.entity.Rating;
 import sk.tuke.gamestudio.entity.Score;
-import sk.tuke.gamestudio.service.CommentService;
-import sk.tuke.gamestudio.service.RatingService;
-import sk.tuke.gamestudio.service.ScoreService;
+import sk.tuke.gamestudio.service.Comment.CommentService;
+import sk.tuke.gamestudio.service.Rating.RatingService;
+import sk.tuke.gamestudio.service.Score.ScoreService;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

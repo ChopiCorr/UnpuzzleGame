@@ -1,6 +1,4 @@
-package sk.tuke.gamestudio.service;
-
-import sk.tuke.gamestudio.entity.Player;
+package sk.tuke.gamestudio.service.Player;
 
 public interface PlayerService
 {

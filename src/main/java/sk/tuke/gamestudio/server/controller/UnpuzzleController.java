@@ -11,7 +11,10 @@ import sk.tuke.gamestudio.entity.Comment;
 import sk.tuke.gamestudio.entity.Rating;
 import sk.tuke.gamestudio.entity.Score;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.*;
-import sk.tuke.gamestudio.service.*;
+import sk.tuke.gamestudio.service.Comment.CommentService;
+import sk.tuke.gamestudio.service.Player.PlayerService;
+import sk.tuke.gamestudio.service.Rating.RatingService;
+import sk.tuke.gamestudio.service.Score.ScoreService;
 
 import java.util.Date;
 import java.util.List;

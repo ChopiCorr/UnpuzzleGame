@@ -9,9 +9,9 @@ import sk.tuke.gamestudio.game.Unpuzzle.Core.Level;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.LevelPresets;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.Piece;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.PieceState;
-import sk.tuke.gamestudio.service.CommentService;
-import sk.tuke.gamestudio.service.RatingService;
-import sk.tuke.gamestudio.service.ScoreService;
+import sk.tuke.gamestudio.service.Comment.CommentService;
+import sk.tuke.gamestudio.service.Rating.RatingService;
+import sk.tuke.gamestudio.service.Score.ScoreService;
 
 import java.text.SimpleDateFormat;
 import java.util.List;

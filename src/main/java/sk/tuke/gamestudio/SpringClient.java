@@ -10,7 +10,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.web.client.RestTemplate;
 import sk.tuke.gamestudio.game.Unpuzzle.consoleUI.ConsoleUI;
-import sk.tuke.gamestudio.service.*;
+import sk.tuke.gamestudio.service.Comment.CommentService;
+import sk.tuke.gamestudio.service.Comment.CommentServiceRestClient;
+import sk.tuke.gamestudio.service.Rating.RatingService;
+import sk.tuke.gamestudio.service.Rating.RatingServiceRestClient;
+import sk.tuke.gamestudio.service.Score.ScoreService;
+import sk.tuke.gamestudio.service.Score.ScoreServiceRestClient;
 
 import java.util.Scanner;
 

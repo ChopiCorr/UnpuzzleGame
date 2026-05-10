@@ -1,9 +1,10 @@
 package sk.tuke.gamestudio.game.Unpuzzle.consoleUI;
 
-import sk.tuke.gamestudio.game.Unpuzzle.Core.Field;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.Level;
 import sk.tuke.gamestudio.game.Unpuzzle.Core.LevelPresets;
-import sk.tuke.gamestudio.service.*;
+import sk.tuke.gamestudio.service.Comment.CommentService;
+import sk.tuke.gamestudio.service.Rating.RatingService;
+import sk.tuke.gamestudio.service.Score.ScoreService;
 
 import java.util.Scanner;
 

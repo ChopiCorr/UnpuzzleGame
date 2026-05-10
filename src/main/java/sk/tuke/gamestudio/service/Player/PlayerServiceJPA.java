@@ -1,4 +1,4 @@
-package sk.tuke.gamestudio.service;
+package sk.tuke.gamestudio.service.Player;
 
 import sk.tuke.gamestudio.entity.Player;
 
