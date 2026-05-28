@@ -55,3 +55,5 @@ Place all files and packages related to your game (e.g. `Main.java`, `core`, `co
 When creating new unit tests, place them into the `src/test/java/sk.tuke.gamestudio.game.[yourGame]` package.
 
 Use the [standard Maven directory layout](https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html) and GameStudio recommended directory structure when adding more classes.
+
+##testing
