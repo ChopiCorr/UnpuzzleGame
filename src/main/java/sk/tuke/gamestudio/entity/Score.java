@@ -31,9 +31,10 @@ public class Score
     private String player;
     private int points;
     private Date playedOn;
+//cas do bd1-    private long duration;
 
     public Score() {}
-
+//pridat long duration a this.duration = duration;
     public Score(String game, String player, int points, Date playedOn)
     {
         this.game = game;
@@ -69,4 +70,6 @@ public class Score
     public void setIdent(int ident) {
         this.ident = ident;
     }
+
+//    public long getDuration() { return duration; }
 }

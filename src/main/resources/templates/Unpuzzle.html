@@ -81,6 +81,11 @@
             <span>Zostatok: <strong th:text="${remaining}"/></span>
         </div>
         <div th:utext="${@unpuzzleController.getHtmlField()}"/>
+<!-- HINT4-4 a UNDO
+        <div class="game-buttons">
+            <a class="btn-hint" th:href="@{/unpuzzle(action='hint')}"> Hint</a>
+             UNDO BUTTON - <a class="btn-undo" th:href="@{/unpuzzle(action='undo')}">Undo</a>
+        </div> -->
     </div>
 
     <!-- таблица скоров -->
@@ -91,12 +96,14 @@
                 <th>#</th>
                 <th>Hrac</th>
                 <th>Body</th>
+                <!-- cas do db - <th>Cas (s)</th> -->
                 <th>Datum</th>
             </tr>
             <tr th:each="score, i : ${topScores}">
                 <td th:text="${i.count}"/>
                 <td th:text="${score.player}"/>
                 <td th:text="${score.points}"/>
+                <!-- cas do db - <td th:text="${score.duration + 's'}"/> -->
                 <td th:text="${#dates.format(score.playedOn, 'yyyy-MM-dd HH:mm')}"/>
             </tr>
         </table>

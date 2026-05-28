@@ -44,6 +44,9 @@ public class UnpuzzleController
     private boolean scoreSaved = false;
     private String message = "";
     private long lastMoveTime = 0;
+    //cas do db private long gameStartTime = 0;
+    //cas do db private long gameDuration = 0;
+    //undo button - private int lastMovePoints = 0;
     private boolean loggedIn = false;
 
     @RequestMapping("/unpuzzle")
@@ -110,6 +113,8 @@ public class UnpuzzleController
                     scoreSaved = false;
                     message = "";
                     lastMoveTime = System.currentTimeMillis();
+                    //cas do db - gameStartTime = System.currentTimeMillis();
+                    //cas do db - gameDuration = 0;
                     break;
 
                 case "remove":
@@ -124,7 +129,41 @@ public class UnpuzzleController
                             lastMoveTime = System.currentTimeMillis();
                             totalPoints += calcPoints(seconds);
                             moveCount++;
+                            //undo button - заменить две верхние строки на:
+                            //lastMovePoints = calcPoints(seconds);
+                            //totalPoints += lastMovePoints;
+                            //moveCount++;
                             message = "Blok " + id + " odstraneny.";
+
+                            if (field.getGameState() == GameState.SOLVED && !scoreSaved)
+                            {
+                                //cas do db - pridat gameDuration = (System.currentTimeMillis() - gameStartTime) / 1000;
+                                saveScore();
+                                scoreSaved = true;
+                                message = "Vyhral si! Skore: " + totalPoints;
+                                //zmenit message: message = "Vyhral si! Skore: " + totalPoints + " za " + gameDuration + "s";
+                            }
+                        }
+                        else
+                        {
+                            message = "Blok " + id + " je zablokovany!";
+                        }
+                    }
+                    break;
+/* HINT2-4
+                case "hint":
+                    if (!loggedIn) { message = "Pre hru sa prihlaste!"; break; }
+                    if (field != null && field.getGameState() == GameState.PLAYING)
+                    {
+                        Piece hint = field.getHintPiece();
+                        if (hint != null)
+                        {
+                            long seconds = (System.currentTimeMillis() - lastMoveTime) / 1000;
+                            lastMoveTime = System.currentTimeMillis();
+                            totalPoints += calcPoints(seconds);
+                            moveCount++;
+                            field.removePiece(hint.getId());
+                            message = "Hint: blok " + hint.getId() + " bol odstraneny.";
 
                             if (field.getGameState() == GameState.SOLVED && !scoreSaved)
                             {
@@ -135,11 +174,30 @@ public class UnpuzzleController
                         }
                         else
                         {
-                            message = "Blok " + id + " je zablokovany!";
+                            message = "Ziadny volny blok.";
                         }
                     }
                     break;
-
+*/
+/* Undo button - case:
+                case "undo":
+                    if (!loggedIn) { message = "Pre hru sa prihlaste!"; break; }
+                    if (field != null && field.undoLastMove())
+                    {
+                        totalPoints -= lastMovePoints;
+                        if (totalPoints < 0) totalPoints = 0;
+                        moveCount--;
+                        if (moveCount < 0) moveCount = 0;
+                        lastMovePoints = 0;
+                        scoreSaved = false;
+                        message = "Posledny tah bol zruseny.";
+                    }
+                    else
+                    {
+                        message = "Nie je co zrusit.";
+                    }
+                    break;
+                    */
                 case "comment":
                     if (!loggedIn) { message = "Pre komentar sa prihlaste!"; break; }
                     if (comment != null && !comment.isEmpty())
@@ -209,6 +267,12 @@ public class UnpuzzleController
             scoreService.addScore(new Score(GAME_NAME, playerName, totalPoints, new Date()));
         }
         catch (Exception e) { message = "Skore sa nepodarilo ulozit."; }
+        /*cas do db - zmenit vsetko tu na:
+        try
+    {
+        scoreService.addScore(new Score(GAME_NAME, playerName, totalPoints, new Date(), gameDuration));
+    }
+    catch (Exception e) { message = "Skore sa nepodarilo ulozit."; } */
     }
 
     private int calcPoints(long seconds)

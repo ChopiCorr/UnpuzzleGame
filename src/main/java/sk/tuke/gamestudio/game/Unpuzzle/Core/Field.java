@@ -10,6 +10,8 @@ public class Field
     private final Piece[][] grid;
     private final List<Piece> pieces;
     private GameState gameState;
+    //Undo button - private Piece lastRemovedPiece = null;
+    //private int lastRemovedPoints = 0;
 
 
     public Field(Level level)
@@ -51,6 +53,7 @@ public class Field
 
         grid[target.getRow()][target.getCol()] = null;
         target.setState(PieceState.REMOVED);
+        //undo button - lastRemovedPiece = target;
 
         gameState = checkGameState();
         return true;
@@ -114,8 +117,31 @@ public class Field
         }
         return null;
     }
+/* HINT1-4
+    public Piece getHintPiece()
+    {
+        for (Piece piece : pieces)
+        {
+            if (piece.getState() == PieceState.ON_BOARD && !isBlocked(piece))
+            {
+                return piece;
+            }
+        }
+        return null;
+    }*/
 
+    /* undo button -
+    public boolean undoLastMove()
+{
+    if (lastRemovedPiece == null) return false;
 
+    lastRemovedPiece.setState(PieceState.ON_BOARD);
+    grid[lastRemovedPiece.getRow()][lastRemovedPiece.getCol()] = lastRemovedPiece;
+    gameState = GameState.PLAYING;
+    lastRemovedPiece = null;
+    return true;
+}
+     */
 
     public GameState getGameState() {
         return gameState;
